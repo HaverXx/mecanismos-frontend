@@ -1,6 +1,6 @@
 <template>
     <div id="rooms">
-        <span class="roomOpt"><u><b>General</b></u></span>
+        <span class="roomOpt"><b>General</b></span>
         <span class="roomOpt">Salón</span>
         <span class="roomOpt">Cocina</span>
         <span class="roomOpt">Dormitorio</span>
@@ -40,13 +40,29 @@
             <h3>Total: 4€</h3>
             <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
         </div>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
+        <div class="mecanismo">
+            <h3>Enchufe simple</h3>
+            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
+            <h3>Precio Unitario: 4€</h3>
+            <h3>Total: 4€</h3>
+            <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
+        </div>
+        <div class="mecanismo">
+            <h3>Enchufe simple</h3>
+            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
+            <h3>Precio Unitario: 4€</h3>
+            <h3>Total: 4€</h3>
+            <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
+        </div>
     </div>
-
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
     <footer>
         <h3 id="cantidadMecanismos">Mecanismos: 3</h3>
         <h3 id="aproxFinal">Precio aproximado: 300€</h3>
@@ -84,9 +100,9 @@ footer {
     box-sizing: border-box;
     text-align: center;
     padding: 20px;
-    background-color: rgba(149, 155, 158, 0.70);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(239, 240, 253, 0.8);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -94,7 +110,8 @@ footer {
 }
 
 #mecanismos {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     padding: 10px;
     width: 100%;
@@ -178,5 +195,27 @@ footer {
 .mecanismo .plus:hover {
     background-color: #c3eacc;
     transform: scale(1.1);
+}
+
+.roomOpt {
+    position: relative;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.roomOpt::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #2c3e50;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.roomOpt:hover::after {
+    transform: scaleX(1);
 }
 </style>
