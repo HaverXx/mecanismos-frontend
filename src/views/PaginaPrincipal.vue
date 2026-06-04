@@ -18,56 +18,6 @@
             <h3>Total: 4€</h3>
             <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
         </div>
-        <div class="mecanismo">
-            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
-            <h3 class="titulo">Enchufe simple</h3>
-            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
-            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
-            <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
-            <h3>Precio Unitario: 4€</h3>
-            <h3>Total: 4€</h3>
-            <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
-        </div>
-        <div class="mecanismo">
-            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
-            <h3 class="titulo">Enchufe simple</h3>
-            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
-            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
-            <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
-            <h3>Precio Unitario: 4€</h3>
-            <h3>Total: 4€</h3>
-            <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
-        </div>
-        <div class="mecanismo">
-            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
-            <h3 class="titulo">Enchufe simple</h3>
-            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
-            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
-            <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
-            <h3>Precio Unitario: 4€</h3>
-            <h3>Total: 4€</h3>
-            <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
-        </div>
-        <div class="mecanismo">
-            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
-            <h3 class="titulo">Enchufe simple</h3>
-            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
-            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
-            <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
-            <h3>Precio Unitario: 4€</h3>
-            <h3>Total: 4€</h3>
-            <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
-        </div>
-        <div class="mecanismo">
-            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
-            <h3 class="titulo">Enchufe simple</h3>
-            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
-            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
-            <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
-            <h3>Precio Unitario: 4€</h3>
-            <h3>Total: 4€</h3>
-            <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
-        </div>
     </div>
         <br>
         <br>
@@ -82,7 +32,22 @@
 </template>
 
 <script>
-
+export default {
+    data() {
+        return{
+            mecanismos: [],
+            cantidadMecanismos: 0,
+            precioAproxFinal: 0,
+        }
+    },
+    mounted() {
+      fetch("http://localhost:3000/mecanismos")
+        .then(res => res.json())
+        .then(data => {
+          this.mecanismos = data;
+        });
+    } 
+}
 </script>
 
 <style>

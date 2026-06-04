@@ -2,10 +2,10 @@
   <div id="tools">
     <img src="./assets/logo.png" alt="Logo" width="50px"/>
     <select id="viviendas" name="viviendas">
-      <option value="1">Casa de Pepe</option>
-      <option value="2">Apartamento los Cibeles</option>
-      <option value="3">Urbanización San Juan - Ramón</option>
-      <option value="4">Chalet de Juan</option>
+      <option v-if="viviendas.length === 0">No hay viviendas</option>
+      <option v-else v-for="vivienda in viviendas" :key="vivienda.id" :value="vivienda.id">
+        {{ vivienda.nombre }}
+      </option>
     </select>
     <img src="./assets/plus.png" alt="Add" width="20px" id="addRoom"/>
     <img src="./assets/user.png" alt="Usuario" width="30px" id="user"/>
@@ -14,7 +14,21 @@
 </template>
 
 <script>
+export default {
+  data() {
+    return {
+      viviendas: [],
+    };
+  },
 
+  mounted() {
+    fetch("http://localhost:3000/viviendas")
+      .then(res => res.json())
+      .then(data => {
+        this.viviendas = data;
+      });
+  }
+};
 </script>
 
 <style>
