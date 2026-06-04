@@ -9,48 +9,60 @@
 
     <div id="mecanismos">
         <div class="mecanismo">
-            <h3>Enchufe simple</h3>
-            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
+            <h3 class="titulo">Enchufe simple</h3>
+            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
+            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
             <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
             <h3>Precio Unitario: 4€</h3>
             <h3>Total: 4€</h3>
             <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
         </div>
         <div class="mecanismo">
-            <h3>Enchufe simple</h3>
-            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
+            <h3 class="titulo">Enchufe simple</h3>
+            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
+            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
             <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
             <h3>Precio Unitario: 4€</h3>
             <h3>Total: 4€</h3>
             <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
         </div>
         <div class="mecanismo">
-            <h3>Enchufe simple</h3>
-            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
+            <h3 class="titulo">Enchufe simple</h3>
+            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
+            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
             <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
             <h3>Precio Unitario: 4€</h3>
             <h3>Total: 4€</h3>
             <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
         </div>
         <div class="mecanismo">
-            <h3>Enchufe simple</h3>
-            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
+            <h3 class="titulo">Enchufe simple</h3>
+            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
+            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
             <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
             <h3>Precio Unitario: 4€</h3>
             <h3>Total: 4€</h3>
             <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
         </div>
         <div class="mecanismo">
-            <h3>Enchufe simple</h3>
-            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
+            <h3 class="titulo">Enchufe simple</h3>
+            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
+            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
             <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
             <h3>Precio Unitario: 4€</h3>
             <h3>Total: 4€</h3>
             <h3><button class="minus">-</button> 1 <button class="plus">+</button></h3>
         </div>
         <div class="mecanismo">
-            <h3>Enchufe simple</h3>
-            <h3>Enchufe marca Legrand modelo 7015912</h3>
+            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar"/>
+            <h3 class="titulo">Enchufe simple</h3>
+            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar"/>
+            <h3 class="desc">Enchufe marca Legrand modelo 7015912</h3>
             <img src="../assets/enchufe.png" alt="Enchufe" width="200px"/>
             <h3>Precio Unitario: 4€</h3>
             <h3>Total: 4€</h3>
@@ -119,6 +131,7 @@ footer {
 }
 
 .mecanismo {
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -155,11 +168,14 @@ footer {
     color: #555;
 }
 
-.mecanismo h3:first-child {
-    font-size: 1.05rem;
+.mecanismo .titulo {
+    font-size: 1.5rem;
     font-weight: 700;
     color: #2c3e50;
-    margin-bottom: 6px;
+    padding-top: 10%;
+}
+
+.desc {
 }
 
 .mecanismo .minus,
@@ -180,6 +196,7 @@ footer {
 .mecanismo .minus {
     background-color: #fce4e4;
     color: #d64545;
+    margin-right: 10px;
 }
 
 .mecanismo .minus:hover {
@@ -190,6 +207,7 @@ footer {
 .mecanismo .plus {
     background-color: #dff5e3;
     color: #2d8a4e;
+    margin-left: 10px;
 }
 
 .mecanismo .plus:hover {
@@ -217,5 +235,40 @@ footer {
 
 .roomOpt:hover::after {
     transform: scaleX(1);
+}
+
+.editar {
+    position: absolute;
+    top: -3px;
+    left: 10px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.editar:hover {
+    background-color: rgba(59, 130, 246, 0.25);
+}
+
+.borrar {
+    position: absolute;
+    top: -3px;
+    right: 10px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.borrar:hover {
+    background-color: rgba(220, 38, 38, 0.25);
+}
+
+.mecanismo:hover .editar,
+.mecanismo:hover .borrar {
+    opacity: 1;
 }
 </style>
