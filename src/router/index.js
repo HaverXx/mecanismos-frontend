@@ -5,7 +5,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            path: "/PaginaPrincipal",
+            path: "/",
             name: "Pagina Principal",
             component: PaginaPrincipal,
         },
