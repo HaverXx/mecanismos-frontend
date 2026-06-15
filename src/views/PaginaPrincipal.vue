@@ -11,7 +11,7 @@
 
     <div id="mecanismos">
         <div class="mecanismo" v-for="mecanismo in mecanismos" :key="mecanismo.idMecanismo">
-            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar" />
+            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar" @click="editarMecanismo(mecanismo), this.editando = true, mecanismoEditado = mecanismo.idMecanismo"/>
             <h3 class="titulo">{{ mecanismo.nombre }}</h3>
             <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar" @click="eliminarMecanismo(mecanismo.idMecanismo)" />
             <h3 class="desc">{{ mecanismo.descripcion }}</h3>
@@ -24,7 +24,7 @@
             </h3>
         </div>
     </div>
-    <button @click="popupVisible = true" id="anyadirMecanismo">
+    <button @click="popupVisible = true, editando = false" id="anyadirMecanismo">
         <p>+</p>
     </button>
     <br />
@@ -36,7 +36,8 @@
     <div id="blur" :class="{ active: popupVisible }">
         <div id="popup">
              <!-- Popup para anyadir mecanismos -->
-             <div id="titulo">Añadir mecanismo</div>
+             <div v-if="!editando" id="titulo">Añadir mecanismo</div>
+             <div v-if="editando" id="titulo">Editar mecanismo</div>
              <div class="popup-body">
                  <p>Nombre</p>
                  <input type="text" placeholder="Ej. Enchufe simple" v-model="nombreAnyadir"/>
@@ -63,7 +64,8 @@
                  <p id="error">{{ error }}</p>
                  <div class="popup-buttons">
                      <button id="btn-cancelar" @click="cerrarPopup">Cancelar</button>
-                     <button id="btn-guardar" :disabled="!puedeGuardar" @click="guardarMecanismo">Guardar</button>
+                     <button v-if="!editando" id="btn-guardar" :disabled="!puedeGuardar" @click="guardarMecanismo">Guardar</button>
+                     <button v-if="editando" id="btn-guardar" :disabled="!puedeGuardar" @click="actualizarMecanismo(mecanismoEditado)">Actualizar</button>
                  </div>
              </div>
         </div>
@@ -90,6 +92,8 @@ export default {
             error: "",
             popupVisible: false,
             defaultImagen,
+            editando: false,
+            mecanismoEditado: null
         }
     },
     computed: {
@@ -98,7 +102,7 @@ export default {
         },
         precioAproxFinal() {
             return this.mecanismos.reduce((sum, m) => sum + (parseFloat(m.precioUnitario) * parseInt(m.cantidad)), 0);
-        }
+        },
     },
     methods: {
         onFileChange(e) {
@@ -190,6 +194,46 @@ export default {
             .catch(err => {
                 alert("No se pudo eliminar el mecanismo: " + err.message);
             });
+        },
+        editarMecanismo(mecanismo) {
+            this.popupVisible = true;
+            this.nombreAnyadir = mecanismo.nombre;
+            this.descripcionAnyadir = mecanismo.descripcion;
+            this.precioAnyadir = mecanismo.precioUnitario;
+            this.cantidadAnyadir = mecanismo.cantidad;
+            this.fotoAnyadir = mecanismo.foto;
+            this.fotoPreview = mecanismo.foto;
+        },
+        actualizarMecanismo(id) {
+            if (!this.puedeGuardar) return;
+            fetch(`http://localhost:3000/mecanismos/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    nombre: this.nombreAnyadir,
+                    descripcion: this.descripcionAnyadir,
+                    precioUnitario: parseFloat(this.precioAnyadir),
+                    cantidad: parseInt(this.cantidadAnyadir),
+                    foto: this.fotoAnyadir || null,
+                    idVivienda: 1
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al guardar en el servidor");
+                return res.json();
+            })
+            .then(data => {
+                this.mecanismos.push(data);
+                this.cerrarPopup();
+            })
+            .catch(err => {
+                alert("No se pudo guardar el mecanismo: " + err.message);
+            });
+        },
+        anyadirMecanismo() {
+            this.popupVisible = true;
         }
     },
     mounted() {
@@ -200,7 +244,6 @@ export default {
             });
     }
 }
-
 
 </script>
 
