@@ -3,10 +3,7 @@
         <span class="roomOpt">
             <b>General</b>
         </span>
-        <span class="roomOpt">Salón</span>
-        <span class="roomOpt">Cocina</span>
-        <span class="roomOpt">Dormitorio</span>
-        <span class="roomOpt">Baño</span>
+        <span v-for="habitacion in habitaciones" :key="habitacion" class="roomOpt">{{ habitacion }}</span>
     </div>
 
     <div id="mecanismos">
@@ -16,17 +13,15 @@
             <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar" @click="eliminarMecanismo(mecanismo.idMecanismo)" />
             <h3 class="desc">{{ mecanismo.descripcion }}</h3>
             <img :src="mecanismo.foto || defaultImagen" alt="Imagen de mecanismo" width="200px" class="mecanismo-img" />
-            <h3>Precio Unitario: {{ mecanismo.precioUnitario }}€</h3>
-            <h3>Total: {{ (mecanismo.precioUnitario * mecanismo.cantidad) }}€</h3>
+            <h3>Precio Unitario: {{ (parseFloat(mecanismo.precioUnitario) || 0).toFixed(2) }}€</h3>
+            <h3>Total: {{ ((parseFloat(mecanismo.precioUnitario) || 0) * (mecanismo.cantidad || 0)).toFixed(2) }}€</h3>
             <h3>
                 <button class="minus" @click="actualizarCantidad(mecanismo, -1)">-</button> {{ mecanismo.cantidad }}
                 <button class="plus" @click="actualizarCantidad(mecanismo, 1)">+</button>
             </h3>
         </div>
     </div>
-    <button @click="popupVisible = true, editando = false" id="anyadirMecanismo">
-        <p>+</p>
-    </button>
+    <img src="../assets/anyadirM.png" alt="Añadir" @click="popupVisible = true, editando = false" id="anyadirMecanismo"/>
     <br />
     <br />
     <br />
@@ -72,7 +67,7 @@
     </div>
     <footer>
         <h3 id="cantidadMecanismos">Mecanismos: {{ mecanismos.length }}</h3>
-        <h3 id="aproxFinal">Precio aproximado: {{ precioAproxFinal }}€</h3>
+        <h3 id="aproxFinal">Precio aproximado: {{ precioAproxFinal.toFixed(2) }}€</h3>
     </footer>
 </template>
 
@@ -88,12 +83,12 @@ export default {
             precioAnyadir: null,
             cantidadAnyadir: null,
             fotoAnyadir: "",
-            fotoPreview: "",
             error: "",
             popupVisible: false,
             defaultImagen,
             editando: false,
-            mecanismoEditado: null
+            mecanismoEditado: null,
+            habitaciones: ["Salón", "Cocina", "Dormitorio", "Baño"],
         }
     },
     computed: {
@@ -101,7 +96,7 @@ export default {
             return this.nombreAnyadir && this.descripcionAnyadir && this.precioAnyadir && this.cantidadAnyadir;
         },
         precioAproxFinal() {
-            return this.mecanismos.reduce((sum, m) => sum + (parseFloat(m.precioUnitario) * parseInt(m.cantidad)), 0);
+            return this.mecanismos.reduce((sum, m) => sum + ((parseFloat(m.precioUnitario) || 0) * (parseInt(m.cantidad) || 0)), 0);
         },
     },
     methods: {
@@ -207,7 +202,7 @@ export default {
         actualizarMecanismo(id) {
             if (!this.puedeGuardar) return;
             fetch(`http://localhost:3000/mecanismos/${id}`, {
-                method: "PUT",
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
                 },
@@ -224,8 +219,15 @@ export default {
                 if (!res.ok) throw new Error("Error al guardar en el servidor");
                 return res.json();
             })
-            .then(data => {
-                this.mecanismos.push(data);
+            .then(() => {
+                const mecanismo = this.mecanismos.find(m => m.idMecanismo === id);
+                if (mecanismo) {
+                    mecanismo.nombre = this.nombreAnyadir;
+                    mecanismo.descripcion = this.descripcionAnyadir;
+                    mecanismo.precioUnitario = parseFloat(this.precioAnyadir);
+                    mecanismo.cantidad = parseInt(this.cantidadAnyadir);
+                    mecanismo.foto = this.fotoAnyadir || null;
+                }
                 this.cerrarPopup();
             })
             .catch(err => {
@@ -587,22 +589,17 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background-color: rgb(109, 180, 247);
-    color: white;
     position: fixed;
     bottom: 15%;
     right: 2%;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: scale(1);
 }
 
 #anyadirMecanismo:hover {
     cursor: pointer;
-    background-color: rgb(138, 191, 240);
-}
-
-#anyadirMecanismo p{
-    padding: 0;
-    margin: 0;
-    font-size: 2rem;
+    opacity: 0.85;
+    transform: scale(1.15);
 }
 
 .upload-container {
