@@ -21,11 +21,11 @@
     </div>
 
     <div v-else-if="error" class="state-message error">
-      <p>⚠️ {{ error }}</p>
+      <p>{{ error }}</p>
     </div>
 
     <div v-else-if="usuariosFiltrados.length === 0" class="state-message empty">
-      <p>👥</p>
+      <p>No se encontraron resultados</p>
       <p>No se encontraron usuarios que coincidan con la búsqueda.</p>
     </div>
 
@@ -36,7 +36,7 @@
         </div>
         <div class="user-info">
           <h3 class="user-fullname">{{ user.fullName }}</h3>
-          <p class="user-email">✉️ {{ user.email }}</p>
+          <p class="user-email">{{ user.email }}</p>
           <span v-if="user.empresa" class="user-badge">{{ user.empresa }}</span>
           <span v-else class="user-badge none">Sin empresa</span>
         </div>

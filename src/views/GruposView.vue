@@ -11,7 +11,7 @@
       <div class="card glass-card invitaciones-card">
         <h3>Invitaciones Recibidas</h3>
         <div v-if="invitaciones.length === 0" class="empty-state">
-          <span class="empty-icon">✉️</span>
+          <span class="empty-icon">Sin invitaciones</span>
           <p>No tienes invitaciones pendientes</p>
         </div>
         <div v-else class="invitaciones-list">
@@ -51,7 +51,7 @@
     <div class="mis-grupos-section">
       <div class="mis-grupos-header">
         <h3>Mis Grupos ({{ grupos.length }})</h3>
-        <button class="btn btn-secondary btn-sm" @click="cargarGrupos">🔄 Recargar</button>
+        <button class="btn btn-secondary btn-sm" @click="cargarGrupos">Recargar</button>
       </div>
 
       <div v-if="loadingGrupos" class="state-message">
@@ -60,7 +60,7 @@
       </div>
 
       <div v-else-if="grupos.length === 0" class="state-message empty">
-        <p>📂</p>
+        <p>No hay grupos</p>
         <p>Aún no perteneces a ningún grupo. ¡Crea uno arriba!</p>
       </div>
 
@@ -86,7 +86,7 @@
               </div>
               <p class="grupo-desc" v-if="grp.descripcion">{{ grp.descripcion }}</p>
               <p class="grupo-desc" v-else><em>Sin descripción</em></p>
-              <span class="grupo-meta">👥 {{ grp.memberCount }} miembros • Creado por: {{ grp.ownerName }}</span>
+              <span class="grupo-meta">{{ grp.memberCount }} miembros &bull; Creado por: {{ grp.ownerName }}</span>
             </div>
           </div>
         </div>
@@ -100,14 +100,14 @@
               class="btn btn-danger btn-xs" 
               @click="eliminarGrupo(grupoSeleccionado.idGrupo)"
             >
-              🗑️ Eliminar Grupo
+              Eliminar Grupo
             </button>
             <button 
               v-else 
               class="btn btn-danger btn-xs" 
               @click="salirDeGrupo(grupoSeleccionado.idGrupo)"
             >
-              🚪 Salir del Grupo
+              Salir del Grupo
             </button>
           </div>
 
@@ -124,20 +124,28 @@
                 <div class="miembro-info">
                   <span class="miembro-name">{{ mbr.fullName }}</span>
                   <span class="miembro-email">{{ mbr.email }}</span>
-                  <span class="miembro-company" v-if="mbr.empresa">🏢 {{ mbr.empresa }}</span>
+                  <span class="miembro-company" v-if="mbr.empresa">{{ mbr.empresa }}</span>
                 </div>
                 <div class="miembro-role-col">
                   <span class="badge" :class="mbr.isOwner ? 'badge-owner' : 'badge-member'">
                     {{ mbr.isOwner ? 'Propietario' : 'Miembro' }}
                   </span>
-                  <button 
-                    v-if="grupoSeleccionado.idOwner === usuarioLogueado.idUsuario && !mbr.isOwner" 
-                    class="btn-kick" 
-                    title="Expulsar del grupo"
-                    @click="expulsarMiembro(grupoSeleccionado.idGrupo, mbr.idUsuario, mbr.fullName)"
-                  >
-                    ✕
-                  </button>
+                  <template v-if="grupoSeleccionado.idOwner === usuarioLogueado.idUsuario && !mbr.isOwner">
+                    <button 
+                      class="btn btn-primary btn-xs" 
+                      title="Hacer propietario"
+                      @click="transferirPropiedad(grupoSeleccionado.idGrupo, mbr.idUsuario, mbr.fullName)"
+                    >
+                      Hacer Propietario
+                    </button>
+                    <button 
+                      class="btn-kick" 
+                      title="Expulsar del grupo"
+                      @click="expulsarMiembro(grupoSeleccionado.idGrupo, mbr.idUsuario, mbr.fullName)"
+                    >
+                      X
+                    </button>
+                  </template>
                 </div>
               </div>
             </div>
@@ -148,7 +156,7 @@
             <h5>Casas Compartidas con este Grupo</h5>
             <div class="viviendas-shared-list" v-if="viviendasCompartidas.length > 0">
               <div v-for="viv in viviendasCompartidas" :key="viv.idVivienda" class="shared-viv-item">
-                <span class="viv-icon">🏠</span>
+                <span class="viv-icon"></span>
                 <div class="viv-text">
                   <strong class="viv-name">{{ viv.nombre }}</strong>
                   <span class="viv-owner">Propietario: {{ viv.idDuenyo === usuarioLogueado.idUsuario ? 'Tú' : (viv.ownerName || 'Otro usuario') }}</span>
@@ -172,13 +180,13 @@
                 {{ invitando ? 'Enviando...' : 'Invitar' }}
               </button>
             </form>
-            <p v-if="invitadoExitoso" class="success-text">✔️ Invitación enviada con éxito.</p>
-            <p v-if="invitadoError" class="error-text">⚠️ {{ invitadoError }}</p>
+            <p v-if="invitadoExitoso" class="success-text">Invitación enviada con éxito.</p>
+            <p v-if="invitadoError" class="error-text">{{ invitadoError }}</p>
           </div>
         </div>
 
         <div class="grupo-detalle-panel glass-card card empty-detail" v-else>
-          <span class="info-icon">💡</span>
+          <span class="info-icon"></span>
           <p>Selecciona un grupo de la lista para ver sus miembros, invitar a otros usuarios o gestionar tu permanencia.</p>
         </div>
       </div>
@@ -434,6 +442,37 @@ export default {
             this.grupoSeleccionado = null;
             this.cargarGrupos();
             this.$emit("cargar-viviendas");
+          })
+          .catch(err => this.$emit("alertar", err.message));
+        }
+      });
+    },
+    transferirPropiedad(idGrupo, idUsuario, name) {
+      this.$emit("confirmar", {
+        mensaje: `¿Estás seguro de que quieres hacer propietario del grupo a ${name}? Perderás los permisos de administración.`,
+        callback: () => {
+          fetch(`http://localhost:3000/grupos/${idGrupo}/owner`, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${this.token}`
+            },
+            body: JSON.stringify({ nuevoOwnerId: idUsuario })
+          })
+          .then(async res => {
+            if (!res.ok) {
+              const data = await res.json().catch(() => ({}));
+              throw new Error(data.error || "No se pudo transferir la propiedad");
+            }
+            return res.json();
+          })
+          .then(() => {
+            this.cargarGrupos();
+            this.cargarMiembros(idGrupo);
+            // Actualizar el grupo seleccionado
+            if (this.grupoSeleccionado && this.grupoSeleccionado.idGrupo === idGrupo) {
+              this.grupoSeleccionado.idOwner = idUsuario;
+            }
           })
           .catch(err => this.$emit("alertar", err.message));
         }

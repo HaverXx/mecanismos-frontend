@@ -7,9 +7,6 @@
         <button class="nav-tab" :class="{ active: vistaActiva === 'mecanismos' }" @click="vistaActiva = 'mecanismos'">
           Mecanismos
         </button>
-        <button class="nav-tab" :class="{ active: vistaActiva === 'usuarios' }" @click="vistaActiva = 'usuarios'">
-          Usuarios
-        </button>
         <button class="nav-tab" :class="{ active: vistaActiva === 'grupos' }" @click="vistaActiva = 'grupos'">
           Grupos
         </button>
@@ -56,7 +53,6 @@
     </div>
     <main class="main-content">
       <PaginaPrincipal v-if="vistaActiva === 'mecanismos'" :idViviendaSeleccionada="idViviendaSeleccionada" :token="token" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
-      <UsuariosView v-else-if="vistaActiva === 'usuarios'" :token="token" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
       <GruposView v-else-if="vistaActiva === 'grupos'" :token="token" :usuarioLogueado="usuarioLogueado" :viviendas="viviendas" @cargar-viviendas="cargarViviendas" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
     </main>
 
@@ -68,7 +64,6 @@
           <!-- Lista de viviendas -->
           <div class="viviendas-lista">
             <div v-if="viviendas.length === 0" class="viviendas-vacio">
-              <p>🏠</p>
               <p>Aún no tienes viviendas</p>
               <p class="viviendas-vacio-sub">Pulsa el botón de abajo para crear tu primera casa</p>
             </div>
@@ -76,8 +71,9 @@
               <div class="vivienda-view-mode">
                 <span class="vivienda-nombre">{{ v.nombre }}</span>
                 <div class="vivienda-actions">
-                  <img src="./assets/editarM.png" alt="Editar" width="12px" class="vivienda-action-icon" @click="abrirEditarVivienda(v)"/>
-                  <img src="./assets/borrar.png" alt="Borrar" width="12px" class="vivienda-action-icon" @click="pedirConfirmacion('¿Estás seguro de que deseas eliminar esta vivienda? Se eliminarán todos sus mecanismos asociados.', () => eliminarVivienda(v.idVivienda))"/>
+                  <img v-if="v.idDuenyo === usuarioLogueado.idUsuario" src="./assets/editarM.png" alt="Editar" width="12px" class="vivienda-action-icon" @click="abrirEditarVivienda(v)"/>
+                  <img v-if="v.idDuenyo === usuarioLogueado.idUsuario" src="./assets/borrar.png" alt="Borrar" width="12px" class="vivienda-action-icon" @click="pedirConfirmacion('¿Estás seguro de que deseas eliminar esta vivienda? Se eliminarán todos sus mecanismos asociados.', () => eliminarVivienda(v.idVivienda))"/>
+                  <span v-if="v.idDuenyo !== usuarioLogueado.idUsuario" class="vivienda-shared-badge">Compartida</span>
                 </div>
               </div>
             </div>
@@ -168,14 +164,12 @@
 <script>
 import PaginaPrincipal from './views/PaginaPrincipal.vue'
 import LoginView from './views/LoginView.vue'
-import UsuariosView from './views/UsuariosView.vue'
 import GruposView from './views/GruposView.vue'
 
 export default {
   components: {
     PaginaPrincipal,
     LoginView,
-    UsuariosView,
     GruposView
   },
   data() {
@@ -721,6 +715,16 @@ body {
 .vivienda-actions {
   display: flex;
   gap: 12px;
+  align-items: center;
+}
+
+.vivienda-shared-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #ebf8ff;
+  color: #2b6cb0;
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .vivienda-action-icon {
