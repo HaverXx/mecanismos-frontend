@@ -1,14 +1,14 @@
 <template>
     <div id="rooms">
-        <span class="roomOpt">
-            <b>General</b>
+        <span class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === null }" @click="habitacionSeleccionada = null">
+            General
         </span>
-        <span v-for="habitacion in habitaciones" :key="habitacion" class="roomOpt">{{ habitacion }}</span>
+        <span v-for="habitacion in habitaciones" :key="habitacion" class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === habitacion }" @click="habitacionSeleccionada = habitacion">{{ habitacion }}</span>
     </div>
 
     <div id="mecanismos">
-        <div class="mecanismo" v-for="mecanismo in mecanismos" :key="mecanismo.idMecanismo">
-            <img src="../assets/editar.png" alt="Editar" width="10px" class="editar" @click="editarMecanismo(mecanismo), this.editando = true, mecanismoEditado = mecanismo.idMecanismo"/>
+        <div class="mecanismo" v-for="mecanismo in mecanismosFiltrados" :key="mecanismo.idMecanismo">
+            <img src="../assets/editarM.png" alt="Editar" width="10px" class="editar" @click="editarMecanismo(mecanismo), this.editando = true, mecanismoEditado = mecanismo.idMecanismo"/>
             <h3 class="titulo">{{ mecanismo.nombre }}</h3>
             <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar" @click="eliminarMecanismo(mecanismo.idMecanismo)" />
             <h3 class="desc">{{ mecanismo.descripcion }}</h3>
@@ -66,7 +66,7 @@
         </div>
     </div>
     <footer>
-        <h3 id="cantidadMecanismos">Mecanismos: {{ mecanismos.length }}</h3>
+        <h3 id="cantidadMecanismos">Mecanismos: {{ mecanismosFiltrados.length }}</h3>
         <h3 id="aproxFinal">Precio aproximado: {{ precioAproxFinal.toFixed(2) }}€</h3>
     </footer>
 </template>
@@ -89,17 +89,59 @@ export default {
             editando: false,
             mecanismoEditado: null,
             habitaciones: ["Salón", "Cocina", "Dormitorio", "Baño"],
+            habitacionSeleccionada: null,
+        }
+    },
+    props: {
+        idViviendaSeleccionada: Number,
+        token: String,
+    },
+    watch: {
+        idViviendaSeleccionada: {
+            immediate: true,
+            handler() {
+                this.cargarMecanismos();
+            }
         }
     },
     computed: {
         puedeGuardar() {
             return this.nombreAnyadir && this.descripcionAnyadir && this.precioAnyadir && this.cantidadAnyadir;
         },
+        mecanismosFiltrados() {
+            if (this.habitacionSeleccionada === null) {
+                // General: mostrar TODOS los mecanismos de la vivienda
+                return this.mecanismos;
+            }
+            // Habitación específica: mostrar solo los de esa habitación
+            return this.mecanismos.filter(m => m.idHabitacion === this.habitacionSeleccionada);
+        },
         precioAproxFinal() {
             return this.mecanismos.reduce((sum, m) => sum + ((parseFloat(m.precioUnitario) || 0) * (parseInt(m.cantidad) || 0)), 0);
         },
     },
     methods: {
+        cargarMecanismos() {
+            if (!this.idViviendaSeleccionada || !this.token) {
+                this.mecanismos = [];
+                return;
+            }
+            fetch(`http://localhost:3000/mecanismos?idVivienda=${this.idViviendaSeleccionada}`, {
+                headers: {
+                    "Authorization": `Bearer ${this.token}`
+                }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Error en servidor al obtener los mecanismos");
+                    return res.json();
+                })
+                .then(data => {
+                    this.mecanismos = data;
+                })
+                .catch(err => {
+                    console.error("Error al cargar mecanismos:", err);
+                });
+        },
         onFileChange(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -138,12 +180,14 @@ export default {
                 precioUnitario: parseFloat(this.precioAnyadir),
                 cantidad: parseInt(this.cantidadAnyadir),
                 foto: this.fotoAnyadir || null,
-                idVivienda: 1
+                idVivienda: this.idViviendaSeleccionada,
+                idHabitacion: this.habitacionSeleccionada
             };
             fetch("http://localhost:3000/mecanismos", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${this.token}`
                 },
                 body: JSON.stringify(nuevoMecanismo)
             })
@@ -165,7 +209,8 @@ export default {
             fetch(`http://localhost:3000/mecanismos/${mecanismo.idMecanismo}`, {
                 method: "PATCH",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${this.token}`
                 },
                 body: JSON.stringify({ cantidad: nuevaCantidad })
             })
@@ -174,20 +219,27 @@ export default {
                 mecanismo.cantidad = nuevaCantidad;
             })
             .catch(err => {
-                alert("No se pudo actualizar la cantidad: " + err.message);
+                this.$emit("alertar", "No se pudo actualizar la cantidad: " + err.message);
             });
         },
         eliminarMecanismo(id) {
-            if (!confirm("¿Estás seguro de que deseas eliminar este mecanismo?")) return;
-            fetch(`http://localhost:3000/mecanismos/${id}`, {
-                method: "DELETE"
-            })
-            .then(res => {
-                if (!res.ok) throw new Error("Error al eliminar del servidor");
-                this.mecanismos = this.mecanismos.filter(m => m.idMecanismo !== id);
-            })
-            .catch(err => {
-                alert("No se pudo eliminar el mecanismo: " + err.message);
+            this.$emit("confirmar", {
+                mensaje: "¿Estás seguro de que deseas eliminar este mecanismo?",
+                callback: () => {
+                    fetch(`http://localhost:3000/mecanismos/${id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${this.token}`
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error("Error al eliminar del servidor");
+                        this.mecanismos = this.mecanismos.filter(m => m.idMecanismo !== id);
+                    })
+                    .catch(err => {
+                        this.$emit("alertar", "No se pudo eliminar el mecanismo: " + err.message);
+                    });
+                }
             });
         },
         editarMecanismo(mecanismo) {
@@ -204,7 +256,8 @@ export default {
             fetch(`http://localhost:3000/mecanismos/${id}`, {
                 method: "PATCH",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${this.token}`
                 },
                 body: JSON.stringify({
                     nombre: this.nombreAnyadir,
@@ -212,7 +265,7 @@ export default {
                     precioUnitario: parseFloat(this.precioAnyadir),
                     cantidad: parseInt(this.cantidadAnyadir),
                     foto: this.fotoAnyadir || null,
-                    idVivienda: 1
+                    idVivienda: this.idViviendaSeleccionada
                 })
             })
             .then(res => {
@@ -231,7 +284,7 @@ export default {
                 this.cerrarPopup();
             })
             .catch(err => {
-                alert("No se pudo guardar el mecanismo: " + err.message);
+                this.$emit("alertar", "No se pudo guardar el mecanismo: " + err.message);
             });
         },
         anyadirMecanismo() {
@@ -239,11 +292,7 @@ export default {
         }
     },
     mounted() {
-        fetch("http://localhost:3000/mecanismos")
-            .then(res => res.json())
-            .then(data => {
-                this.mecanismos = data;
-            });
+        // Carga inicial controlada por el watch immediate
     }
 }
 
@@ -384,6 +433,9 @@ footer {
     position: relative;
     cursor: pointer;
     text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .roomOpt::after {
@@ -400,6 +452,17 @@ footer {
 
 .roomOpt:hover::after {
     transform: scaleX(1);
+}
+
+.roomOptActive {
+    background-color: rgba(109, 180, 247, 0.15);
+    color: rgb(74, 151, 237);
+    font-weight: 700;
+}
+
+.roomOptActive::after {
+    transform: scaleX(1);
+    background-color: rgb(74, 151, 237);
 }
 
 .editar {
@@ -679,5 +742,128 @@ footer {
     object-fit: contain;
     border-radius: 12px;
     margin: 8px 0;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 640px) {
+    #rooms {
+        gap: 12px;
+        padding: 12px 8px;
+        flex-wrap: wrap;
+    }
+
+    .roomOpt {
+        font-size: 0.85rem;
+        padding: 5px 10px;
+    }
+
+    #mecanismos {
+        justify-content: center;
+        gap: 12px;
+        padding: 12px 8px;
+    }
+
+    .mecanismo {
+        width: calc(50% - 18px);
+        min-width: 140px;
+        padding: 14px 10px;
+        border-radius: 16px;
+    }
+
+    .mecanismo .titulo {
+        font-size: 1.1rem;
+        padding-top: 6%;
+    }
+
+    .mecanismo h3 {
+        font-size: 0.78rem;
+    }
+
+    .mecanismo .minus,
+    .mecanismo .plus {
+        width: 28px;
+        height: 28px;
+        font-size: 0.95rem;
+    }
+
+    .mecanismo .minus {
+        margin-right: 6px;
+    }
+
+    .mecanismo .plus {
+        margin-left: 6px;
+    }
+
+    .mecanismo-img {
+        max-width: 120px;
+        height: 100px;
+    }
+
+    .editar,
+    .borrar {
+        opacity: 0.7;
+    }
+
+    #anyadirMecanismo {
+        width: 48px !important;
+        height: 48px !important;
+        bottom: 100px;
+        right: 16px;
+    }
+
+    #popup {
+        width: calc(100% - 32px);
+        max-width: 380px;
+    }
+
+    .popup-body {
+        padding: 16px;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .popup-body p {
+        font-size: 0.85rem;
+    }
+
+    #titulo {
+        padding: 16px;
+        font-size: 1.15rem;
+    }
+
+    .popup-buttons {
+        justify-content: stretch;
+    }
+
+    .popup-buttons button {
+        flex: 1;
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    footer {
+        padding: 8px 12px;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    footer h3 {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .mecanismo {
+        width: 100%;
+    }
+
+    #rooms {
+        gap: 8px;
+    }
+
+    .roomOpt {
+        font-size: 0.8rem;
+        padding: 4px 8px;
+    }
 }
 </style>
