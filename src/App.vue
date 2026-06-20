@@ -3,16 +3,7 @@
     <div id="tools">
       <img src="./assets/logo.png" alt="Logo" width="50px"/>
       
-      <div class="nav-tabs">
-        <button class="nav-tab" :class="{ active: vistaActiva === 'mecanismos' }" @click="vistaActiva = 'mecanismos'">
-          Mecanismos
-        </button>
-        <button class="nav-tab" :class="{ active: vistaActiva === 'grupos' }" @click="vistaActiva = 'grupos'">
-          Grupos
-        </button>
-      </div>
-
-      <template v-if="vistaActiva === 'mecanismos'">
+      <template v-if="vistaActiva === 'mecanismos' || vistaActiva === 'presupuestos'">
         <select id="viviendas" name="viviendas" v-model="idViviendaSeleccionada" @change="CambiarViviendaSeleccionada()">
           <option v-if="viviendas.length === 0" :value="null">No hay viviendas</option>
           <option v-else v-for="vivienda in viviendas" :key="vivienda.idVivienda" :value="vivienda.idVivienda">
@@ -21,7 +12,36 @@
         </select>
         <img src="./assets/editarC.png" alt="Add" width="20px" id="addRoom" @click="popupViviendas = true"/>
       </template>
+
+      <div class="nav-tabs">
+        <button class="nav-tab" :class="{ active: vistaActiva === 'mecanismos' }" @click="vistaActiva = 'mecanismos'">
+          Mecanismos
+        </button>
+        <button class="nav-tab" :class="{ active: vistaActiva === 'presupuestos' }" @click="vistaActiva = 'presupuestos'">
+          Presupuestos
+        </button>
+        <button class="nav-tab" :class="{ active: vistaActiva === 'grupos' }" @click="vistaActiva = 'grupos'">
+          Grupos
+        </button>
+      </div>
       
+      <button class="theme-toggle-btn" @click="toggleTheme" aria-label="Cambiar tema">
+        <svg v-if="temaOscuro" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
       <div class="user-panel">
         <div class="user-dropdown-container" ref="userDropdown">
           <button class="user-avatar-btn" @click="toggleDropdown" aria-label="Usuario">
@@ -53,6 +73,7 @@
     </div>
     <main class="main-content">
       <PaginaPrincipal v-if="vistaActiva === 'mecanismos'" :idViviendaSeleccionada="idViviendaSeleccionada" :token="token" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
+      <PresupuestosView v-else-if="vistaActiva === 'presupuestos'" :idViviendaSeleccionada="idViviendaSeleccionada" :token="token" :viviendas="viviendas" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
       <GruposView v-else-if="vistaActiva === 'grupos'" :token="token" :usuarioLogueado="usuarioLogueado" :viviendas="viviendas" @cargar-viviendas="cargarViviendas" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
     </main>
 
@@ -131,10 +152,10 @@
     </div>
     <!-- Popup de Confirmación Genérico -->
     <div id="blur-confirm" :class="{ active: popupConfirm }">
-      <div id="popup-confirm">
+      <div id="popup-confirm" style="background-color: var(--popup-bg); border: 1px solid var(--card-border);">
         <div id="titulo-confirm">Confirmar acción</div>
         <div class="popup-body-confirm">
-          <p class="confirm-msg">{{ confirmMsg }}</p>
+          <p class="confirm-msg" style="color: var(--text-color);">{{ confirmMsg }}</p>
           <div class="popup-buttons-confirm">
             <button class="btn-cancelar-confirm" @click="popupConfirm = false">Cancelar</button>
             <button class="btn-confirmar" @click="ejecutarConfirmacion">Confirmar</button>
@@ -145,10 +166,10 @@
 
     <!-- Popup de Alerta Genérico -->
     <div id="blur-alert" :class="{ active: popupAlert }">
-      <div id="popup-alert">
+      <div id="popup-alert" style="background-color: var(--popup-bg); border: 1px solid var(--card-border);">
         <div id="titulo-alert">Aviso</div>
         <div class="popup-body-alert">
-          <p class="alert-msg">{{ alertMsg }}</p>
+          <p class="alert-msg" style="color: var(--text-color);">{{ alertMsg }}</p>
           <div class="popup-buttons-alert">
             <button class="btn-confirmar" style="background-color: rgb(100, 98, 194); width: 100%; border: none; outline: none; border-radius: 8px;" @click="popupAlert = false">Aceptar</button>
           </div>
@@ -165,12 +186,14 @@
 import PaginaPrincipal from './views/PaginaPrincipal.vue'
 import LoginView from './views/LoginView.vue'
 import GruposView from './views/GruposView.vue'
+import PresupuestosView from './views/PresupuestosView.vue'
 
 export default {
   components: {
     PaginaPrincipal,
     LoginView,
-    GruposView
+    GruposView,
+    PresupuestosView
   },
   data() {
     const savedUser = localStorage.getItem("user");
@@ -193,7 +216,8 @@ export default {
       dropdownAbierto: false,
       vistaActiva: "mecanismos",
       nuevaViviendaGrupoId: null,
-      gruposPropiosYMiembro: []
+      gruposPropiosYMiembro: [],
+      temaOscuro: localStorage.getItem("temaOscuro") === "true"
     };
   },
   methods: {
@@ -402,9 +426,22 @@ export default {
       if (container && !container.contains(event.target)) {
         this.dropdownAbierto = false;
       }
+    },
+    toggleTheme() {
+      this.temaOscuro = !this.temaOscuro;
+      localStorage.setItem("temaOscuro", this.temaOscuro);
+      this.aplicarTema();
+    },
+    aplicarTema() {
+      if (this.temaOscuro) {
+        document.body.classList.add("dark-theme");
+      } else {
+        document.body.classList.remove("dark-theme");
+      }
     }
   },
   mounted() {
+    this.aplicarTema();
     if (this.token) {
       this.cargarViviendas();
     }
@@ -420,17 +457,49 @@ export default {
 p {
   margin: 0;
 }
+:root {
+  --bg-gradient: linear-gradient(158deg, rgba(240, 245, 255, 1) 0%, rgba(203, 202, 221, 1) 100%);
+  --text-color: #2c3e50;
+  --card-bg: white;
+  --card-border: rgba(0, 0, 0, 0.05);
+  --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  --input-bg: #fcfdfd;
+  --input-border: rgba(0, 0, 0, 0.12);
+  --footer-bg: rgba(239, 240, 253, 0.8);
+  --popup-bg: white;
+  --text-secondary: #718096;
+  --dropdown-bg: rgba(255, 255, 255, 0.9);
+  --dropdown-border: rgba(255, 255, 255, 0.5);
+  --dropdown-hover: rgba(0, 0, 0, 0.04);
+}
+
+body.dark-theme {
+  --bg-gradient: linear-gradient(158deg, rgba(30, 32, 45, 1) 0%, rgba(16, 16, 24, 1) 100%);
+  --text-color: #e2e8f0;
+  --card-bg: #2d3748;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  --input-bg: #1a202c;
+  --input-border: #4a5568;
+  --footer-bg: rgba(26, 32, 44, 0.85);
+  --popup-bg: #2d3748;
+  --text-secondary: #a0aec0;
+  --dropdown-bg: rgba(45, 55, 72, 0.95);
+  --dropdown-border: rgba(255, 255, 255, 0.1);
+  --dropdown-hover: rgba(255, 255, 255, 0.08);
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: var(--text-color);
 }
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(158deg,rgba(240, 245, 255, 1) 0%, rgba(203, 202, 221, 1) 100%);
+  background: var(--bg-gradient);
   min-height: 100vh;
 }
 #tools {
@@ -444,7 +513,7 @@ body {
 .nav-tabs {
   display: flex;
   gap: 10px;
-  margin-left: 20px;
+  margin-left: auto;
 }
 
 .nav-tab {
@@ -484,7 +553,6 @@ body {
 }
 
 .user-panel {
-  margin-left: auto;
   position: relative;
 }
 
@@ -544,12 +612,12 @@ body {
   top: calc(100% + 10px);
   right: 0;
   width: 220px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--dropdown-bg);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--dropdown-border);
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--card-shadow);
   padding: 8px;
   z-index: 1000;
   display: flex;
@@ -576,7 +644,7 @@ body {
 
 .dropdown-welcome {
   font-size: 0.75rem;
-  color: #718096;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -586,13 +654,13 @@ body {
 .dropdown-name {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--text-color);
   word-break: break-all;
 }
 
 .dropdown-divider {
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.06);
+  background-color: var(--dropdown-border);
   margin: 6px 0;
 }
 
@@ -611,6 +679,11 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   box-sizing: border-box;
+  color: var(--text-color);
+}
+
+.dropdown-item:hover {
+  background-color: var(--dropdown-hover);
 }
 
 .dropdown-item.btn-logout {
@@ -634,6 +707,34 @@ body {
   cursor: pointer;
 }
 
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  color: white;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.theme-icon {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
 /* POPUP VIVIENDAS */
 #blur-viviendas {
   position: fixed;
@@ -653,13 +754,13 @@ body {
 
 #popup-viviendas {
   position: fixed;
-  background-color: white;
+  background-color: var(--popup-bg);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   border-radius: 20px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
   width: 380px;
   overflow: hidden;
 }
@@ -683,20 +784,20 @@ body {
 .viviendas-lista {
   max-height: 220px;
   overflow-y: auto;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--input-border);
   border-radius: 10px;
   padding: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: #fcfdfd;
+  background-color: var(--input-bg);
 }
 
 .vivienda-item {
   padding: 10px 12px;
   border-radius: 8px;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.03);
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
   box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
@@ -708,7 +809,7 @@ body {
 
 .vivienda-nombre {
   font-weight: 600;
-  color: #334155;
+  color: var(--text-color);
   font-size: 0.95rem;
 }
 
@@ -781,13 +882,13 @@ body {
 
 #popup-form-vivienda {
   position: fixed;
-  background-color: white;
+  background-color: var(--popup-bg);
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   border-radius: 20px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
   width: 380px;
   overflow: hidden;
 }
@@ -810,7 +911,7 @@ body {
 
 .form-label {
   font-weight: 600;
-  color: #4a5568;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   text-align: left;
   margin: 0;

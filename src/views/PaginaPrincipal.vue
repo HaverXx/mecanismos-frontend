@@ -12,7 +12,9 @@
             <h3 class="titulo">{{ mecanismo.nombre }}</h3>
             <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar" @click="eliminarMecanismo(mecanismo.idMecanismo)" />
             <h3 class="desc">{{ mecanismo.descripcion }}</h3>
-            <img :src="mecanismo.foto || defaultImagen" alt="Imagen de mecanismo" width="200px" class="mecanismo-img" />
+            <div class="mecanismo-img-container">
+                <img :src="mecanismo.foto || defaultImagen" alt="Imagen de mecanismo" class="mecanismo-img" />
+            </div>
             <h3>Precio Unitario: {{ (parseFloat(mecanismo.precioUnitario) || 0).toFixed(2) }}€</h3>
             <h3>Total: {{ ((parseFloat(mecanismo.precioUnitario) || 0) * (mecanismo.cantidad || 0)).toFixed(2) }}€</h3>
             <h3>
@@ -325,14 +327,15 @@ footer {
     box-sizing: border-box;
     text-align: center;
     padding: 1%;
-    background-color: rgba(239, 240, 253, 0.8);
+    background-color: var(--footer-bg);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    z-index: -1;
+    z-index: 10;
+    color: var(--text-color);
 }
 
 #mecanismos {
@@ -350,13 +353,13 @@ footer {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: linear-gradient(145deg, #ffffff, #f0f2f5);
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
     border-radius: 20px;
     width: 220px;
     text-align: center;
     padding: 20px 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--card-shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -365,27 +368,31 @@ footer {
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.mecanismo img {
+.mecanismo-img-container {
     border-radius: 12px;
-    background-color: #fff;
+    background-color: var(--input-bg);
     padding: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--card-border);
     margin: 8px 0;
-    max-width: 100%;
-    height: auto;
+    width: 200px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .mecanismo h3 {
     margin: 4px 0;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #555;
+    color: var(--text-secondary);
 }
 
 .mecanismo .titulo {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: var(--text-color);
     padding-top: 10%;
 }
 
@@ -436,6 +443,7 @@ footer {
     padding: 6px 12px;
     border-radius: 8px;
     transition: background-color 0.2s ease, color 0.2s ease;
+    color: var(--text-secondary);
 }
 
 .roomOpt::after {
@@ -445,7 +453,7 @@ footer {
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: #2c3e50;
+    background-color: var(--text-color);
     transform: scaleX(0);
     transition: transform 0.3s ease;
 }
@@ -502,13 +510,13 @@ footer {
 
 #popup {
     position: fixed;
-    background-color: white;
+    background-color: var(--popup-bg);
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     border-radius: 20px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--card-border);
     width: 380px;
     overflow: hidden;
 }
@@ -533,7 +541,7 @@ footer {
 .popup-body p {
     margin: 0;
     font-weight: 600;
-    color: #4a5568;
+    color: var(--text-secondary);
     font-size: 0.95rem;
     text-align: left;
 }
@@ -543,7 +551,9 @@ footer {
     box-sizing: border-box;
     padding: 10px 14px;
     border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-color);
     font-size: 0.95rem;
     transition: border-color 0.2s, box-shadow 0.2s;
     outline: none;
@@ -736,12 +746,10 @@ footer {
 }
 
 .mecanismo-img {
-    width: 100%;
-    max-width: 200px;
-    height: 150px;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    border-radius: 12px;
-    margin: 8px 0;
+    border-radius: 8px;
 }
 
 /* ===== MOBILE RESPONSIVE ===== */

@@ -529,13 +529,13 @@ export default {
 
 .header-section h2 {
   font-size: 1.8rem;
-  color: #1a202c;
+  color: var(--text-color);
   margin: 0 0 6px 0;
   font-weight: 700;
 }
 
 .subtitle {
-  color: #718096;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   margin: 0;
 }
@@ -549,20 +549,20 @@ export default {
 }
 
 .card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   text-align: left;
 }
 
 .card h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-color);
   margin: 0 0 15px 0;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.02);
+  border-bottom: 2px solid var(--card-border);
   padding-bottom: 10px;
 }
 
@@ -582,22 +582,23 @@ export default {
 .form-group label {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--text-secondary);
 }
 
 .form-input {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.9rem;
   outline: none;
-  background: #f7fafc;
+  background: var(--input-bg);
+  color: var(--text-color);
   transition: all 0.2s;
 }
 
 .form-input:focus {
   border-color: rgb(109, 180, 247);
-  background: white;
+  background: var(--input-bg);
   box-shadow: 0 0 8px rgba(109, 180, 247, 0.25);
 }
 
@@ -630,11 +631,11 @@ export default {
 }
 
 .btn-secondary {
-  background: #e2e8f0;
-  color: #4a5568;
+  background: var(--input-border);
+  color: var(--text-color);
 }
 .btn-secondary:hover {
-  background: #cbd5e0;
+  background: var(--dropdown-hover);
 }
 
 .btn-success {
@@ -679,10 +680,10 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f7fafc;
+  background: var(--input-bg);
   padding: 12px;
   border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.02);
+  border: 1px solid var(--card-border);
 }
 
 .inv-info {
@@ -693,13 +694,13 @@ export default {
 
 .inv-group {
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-color);
   font-size: 0.95rem;
 }
 
 .inv-sender {
   font-size: 0.8rem;
-  color: #718096;
+  color: var(--text-secondary);
 }
 
 .inv-actions {
@@ -710,7 +711,7 @@ export default {
 .empty-state {
   text-align: center;
   padding: 30px 10px;
-  color: #a0aec0;
+  color: var(--text-secondary);
 }
 
 .empty-icon {
@@ -735,7 +736,7 @@ export default {
 .mis-grupos-header h3 {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-color);
   margin: 0;
 }
 
@@ -754,8 +755,8 @@ export default {
 }
 
 .grupo-item {
-  background: white;
-  border: 1px solid rgba(0,0,0,0.05);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 14px;
   padding: 16px;
   display: flex;
@@ -763,7 +764,8 @@ export default {
   gap: 14px;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+  box-shadow: var(--card-shadow);
+  color: var(--text-color);
 }
 
 .grupo-item:hover {
@@ -773,7 +775,7 @@ export default {
 
 .grupo-item.active {
   border-color: rgb(109, 180, 247);
-  background: rgba(109, 180, 247, 0.03);
+  background: rgba(109, 180, 247, 0.08);
   box-shadow: 0 4px 15px rgba(109, 180, 247, 0.08);
 }
 
@@ -781,8 +783,8 @@ export default {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background: #edf2f7;
-  color: #4a5568;
+  background: var(--input-bg);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -810,13 +812,13 @@ export default {
 
 .grupo-name {
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-color);
   font-size: 1rem;
 }
 
 .grupo-desc {
   font-size: 0.85rem;
-  color: #718096;
+  color: var(--text-secondary);
   margin: 2px 0 4px 0;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -826,7 +828,7 @@ export default {
 
 .grupo-meta {
   font-size: 0.75rem;
-  color: #a0aec0;
+  color: var(--text-secondary);
 }
 
 /* Insignias de roles */
@@ -841,14 +843,14 @@ export default {
   color: #234e52;
 }
 .badge-member {
-  background: #f7fafc;
-  color: #4a5568;
-  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--input-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--card-border);
 }
 
 /* Panel detalle */
 .grupo-detalle-panel {
-  background: white;
+  background: var(--card-bg);
   min-height: 400px;
   display: flex;
   flex-direction: column;
@@ -859,7 +861,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid rgba(0,0,0,0.02);
+  border-bottom: 2px solid var(--card-border);
   padding-bottom: 12px;
 }
 
@@ -867,14 +869,14 @@ export default {
   font-size: 1.3rem;
   margin: 0;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--text-color);
 }
 
 .detalle-desc {
   font-size: 0.9rem;
-  color: #4a5568;
+  color: var(--text-color);
   margin: 0;
-  background: #f7fafc;
+  background: var(--input-bg);
   padding: 12px;
   border-radius: 10px;
 }
@@ -888,7 +890,7 @@ export default {
 .detalle-section h5 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #4a5568;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -905,8 +907,8 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fcfcfc;
-  border: 1px solid rgba(0,0,0,0.03);
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
   padding: 10px 12px;
   border-radius: 8px;
 }
@@ -920,16 +922,16 @@ export default {
 
 .miembro-name {
   font-weight: 600;
-  color: #2d3748;
+  color: var(--text-color);
 }
 
 .miembro-email {
-  color: #718096;
+  color: var(--text-secondary);
   font-size: 0.75rem;
 }
 
 .miembro-company {
-  color: #a0aec0;
+  color: var(--text-secondary);
   font-size: 0.75rem;
   margin-top: 1px;
 }
@@ -942,7 +944,7 @@ export default {
 
 .btn-kick {
   background: transparent;
-  color: #a0aec0;
+  color: var(--text-secondary);
   border: none;
   font-weight: 700;
   cursor: pointer;
@@ -966,9 +968,9 @@ export default {
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  background: #f7fafc;
+  background: var(--input-bg);
   border-radius: 8px;
-  border: 1px solid rgba(0,0,0,0.03);
+  border: 1px solid var(--card-border);
 }
 
 .viv-icon {
@@ -983,20 +985,20 @@ export default {
 }
 
 .viv-name {
-  color: #2d3748;
+  color: var(--text-color);
 }
 
 .viv-owner {
-  color: #a0aec0;
+  color: var(--text-secondary);
   font-size: 0.7rem;
 }
 
 .empty-state.mini {
-  background: #fcfcfc;
-  border: 1px dashed rgba(0, 0, 0, 0.08);
+  background: var(--input-bg);
+  border: 1px dashed var(--card-border);
   border-radius: 8px;
   padding: 15px;
-  color: #718096;
+  color: var(--text-secondary);
   font-size: 0.8rem;
 }
 
@@ -1009,7 +1011,7 @@ export default {
 }
 
 .hint {
-  color: #a0aec0;
+  color: var(--text-secondary);
   font-size: 0.75rem;
 }
 
@@ -1043,7 +1045,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #718096;
+  color: var(--text-secondary);
   padding: 40px;
   gap: 15px;
 }
@@ -1056,7 +1058,7 @@ export default {
 .state-message {
   padding: 40px 10px;
   text-align: center;
-  color: #718096;
+  color: var(--text-secondary);
   font-size: 0.95rem;
 }
 
@@ -1073,7 +1075,7 @@ export default {
 
 /* Spinner */
 .spinner {
-  border: 3px solid rgba(0, 0, 0, 0.05);
+  border: 3px solid var(--card-border);
   border-top: 3px solid rgb(109, 180, 247);
   border-radius: 50%;
   width: 24px;
