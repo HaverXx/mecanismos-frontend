@@ -363,7 +363,7 @@ export default {
         this.presupuestos = [];
         return;
       }
-      fetch(`http://localhost:3000/presupuestos?idVivienda=${this.idViviendaSeleccionada}`, {
+      fetch(`${window.API_URL}/presupuestos?idVivienda=${this.idViviendaSeleccionada}`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }
@@ -380,7 +380,7 @@ export default {
       });
     },
     cargarDetallePresupuesto(id) {
-      fetch(`http://localhost:3000/presupuestos/${id}`, {
+      fetch(`${window.API_URL}/presupuestos/${id}`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }
@@ -421,7 +421,7 @@ export default {
       }
       // Inicializar y fetch silencioso
       presupuesto.totalCalculado = 0;
-      fetch(`http://localhost:3000/presupuestos/${presupuesto.idPresupuesto}`, {
+      fetch(`${window.API_URL}/presupuestos/${presupuesto.idPresupuesto}`, {
         headers: { "Authorization": `Bearer ${this.token}` }
       })
       .then(res => res.json())
@@ -464,7 +464,7 @@ export default {
         estado: "BORRADOR"
       };
 
-      fetch("http://localhost:3000/presupuestos", {
+      fetch(`${window.API_URL}/presupuestos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -503,7 +503,7 @@ export default {
         anadidos: this.editandoPresupuesto.anadidos
       };
 
-      fetch(`http://localhost:3000/presupuestos/${this.editandoPresupuesto.idPresupuesto}`, {
+      fetch(`${window.API_URL}/presupuestos/${this.editandoPresupuesto.idPresupuesto}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -537,7 +537,7 @@ export default {
       this.$emit("confirmar", {
         mensaje: "¿Estás seguro de que deseas eliminar este presupuesto? Se borrarán todos los precios e ítems personalizados del mismo.",
         callback: () => {
-          fetch(`http://localhost:3000/presupuestos/${id}`, {
+          fetch(`${window.API_URL}/presupuestos/${id}`, {
             method: "DELETE",
             headers: {
               "Authorization": `Bearer ${this.token}`
@@ -554,7 +554,7 @@ export default {
       });
     },
     descargarPDFDirecto(id) {
-      fetch(`http://localhost:3000/presupuestos/${id}`, {
+      fetch(`${window.API_URL}/presupuestos/${id}`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }

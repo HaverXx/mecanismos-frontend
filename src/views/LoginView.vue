@@ -78,7 +78,7 @@ export default {
                 ? { email: this.email, password: this.password }
                 : { email: this.email, password: this.password, fullName: this.fullName, empresa: this.empresa };
 
-            fetch(`http://localhost:3000${endpoint}`, {
+            fetch(`${window.API_URL}${endpoint}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -99,7 +99,7 @@ export default {
                 } else {
                     this.success = "¡Registro exitoso! Iniciando sesión...";
                     // Auto login después del registro
-                    fetch("http://localhost:3000/login", {
+                    fetch(`${window.API_URL}/login`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"

@@ -76,7 +76,7 @@ export default {
     cargarUsuarios() {
       this.loading = true;
       this.error = "";
-      fetch("http://localhost:3000/usuarios", {
+      fetch(`${window.API_URL}/usuarios`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }

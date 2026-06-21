@@ -1,6 +1,32 @@
 <template>
   <div v-if="usuarioLogueado">
+    <!-- Sidebar / Menú Lateral -->
+    <div class="sidebar-overlay" :class="{ active: sidebarAbierto }" @click="sidebarAbierto = false"></div>
+    <div class="sidebar" :class="{ active: sidebarAbierto }">
+      <div class="sidebar-header">
+        <h3>{{ viviendaSeleccionadaObj?.nombre || 'Vivienda' }}</h3>
+        <button class="btn-close-sidebar" @click="sidebarAbierto = false">&times;</button>
+      </div>
+      <div class="sidebar-content" v-if="viviendaSeleccionadaObj">
+        <div class="sidebar-section">
+          <p class="sidebar-label">Plano de la vivienda:</p>
+          <img v-if="viviendaSeleccionadaObj.plano" :src="viviendaSeleccionadaObj.plano" alt="Plano" class="sidebar-plano" />
+          <p v-else class="sidebar-no-info">No hay plano disponible</p>
+        </div>
+        <div class="sidebar-section">
+          <p class="sidebar-label">Info:</p>
+          <p>Propietario: {{ viviendaSeleccionadaObj.idDuenyo === usuarioLogueado.idUsuario ? 'Tú' : (viviendaSeleccionadaObj.ownerName || 'Otro') }}</p>
+        </div>
+        <button v-if="viviendaSeleccionadaObj.idDuenyo === usuarioLogueado.idUsuario" class="btn-editar-sidebar" @click="abrirEditarVivienda(viviendaSeleccionadaObj); sidebarAbierto = false;">
+          Editar Vivienda
+        </button>
+      </div>
+    </div>
+
     <div id="tools">
+      <button class="hamburger-btn" @click="sidebarAbierto = true" aria-label="Menú">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
       <img src="./assets/logo.png" alt="Logo" width="50px"/>
       
       <template v-if="vistaActiva === 'mecanismos' || vistaActiva === 'presupuestos'">
@@ -199,6 +225,7 @@ export default {
     const savedUser = localStorage.getItem("user");
     return {
       token: localStorage.getItem("token") || "",
+      sidebarAbierto: false,
       usuarioLogueado: savedUser ? JSON.parse(savedUser) : null,
       viviendas: [],
       popupViviendas: false,
@@ -220,11 +247,16 @@ export default {
       temaOscuro: localStorage.getItem("temaOscuro") === "true"
     };
   },
+  computed: {
+    viviendaSeleccionadaObj() {
+      return this.viviendas.find(v => v.idVivienda === this.idViviendaSeleccionada);
+    }
+  },
   methods: {
     cargarViviendas() {
       if (!this.token) return;
       this.cargarGruposVivienda();
-      fetch("http://localhost:3000/viviendas", {
+      fetch(`${window.API_URL}/viviendas`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }
@@ -254,7 +286,7 @@ export default {
     },
     cargarGruposVivienda() {
       if (!this.token) return;
-      fetch("http://localhost:3000/grupos/mis-grupos", {
+      fetch(`${window.API_URL}/grupos/mis-grupos`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }
@@ -337,8 +369,8 @@ export default {
       };
 
       const url = this.editandoViviendaId 
-        ? `http://localhost:3000/viviendas/${this.editandoViviendaId}`
-        : "http://localhost:3000/viviendas";
+        ? `${window.API_URL}/viviendas/${this.editandoViviendaId}`
+        : `${window.API_URL}/viviendas`;
 
       const method = this.editandoViviendaId ? "PATCH" : "POST";
 
@@ -394,7 +426,7 @@ export default {
       }
     },
     eliminarVivienda(id) {
-      fetch(`http://localhost:3000/viviendas/${id}`, {
+      fetch(`${window.API_URL}/viviendas/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${this.token}`
@@ -471,6 +503,7 @@ p {
   --dropdown-bg: rgba(255, 255, 255, 0.9);
   --dropdown-border: rgba(255, 255, 255, 0.5);
   --dropdown-hover: rgba(0, 0, 0, 0.04);
+  --tools-gradient: linear-gradient(158deg, rgba(171, 202, 255, 1) 0%, rgba(100, 98, 194, 1) 100%);
 }
 
 body.dark-theme {
@@ -487,6 +520,7 @@ body.dark-theme {
   --dropdown-bg: rgba(45, 55, 72, 0.95);
   --dropdown-border: rgba(255, 255, 255, 0.1);
   --dropdown-hover: rgba(255, 255, 255, 0.08);
+  --tools-gradient: linear-gradient(158deg, rgba(48, 55, 99, 1) 0%, rgba(24, 25, 41, 1) 100%);
 }
 
 #app {
@@ -503,7 +537,7 @@ body {
   min-height: 100vh;
 }
 #tools {
-  background: linear-gradient(158deg,rgba(171, 202, 255, 1) 0%, rgba(100, 98, 194, 1) 100%);
+  background: var(--tools-gradient);
   padding: 20px;
   display: flex;
   align-items: center;
@@ -762,7 +796,9 @@ body {
   box-shadow: var(--card-shadow);
   border: 1px solid var(--card-border);
   width: 380px;
-  overflow: hidden;
+  max-width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 #titulo-viviendas {
@@ -890,7 +926,9 @@ body {
   box-shadow: var(--card-shadow);
   border: 1px solid var(--card-border);
   width: 380px;
-  overflow: hidden;
+  max-width: 95%;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 #titulo-form-vivienda {
@@ -1254,4 +1292,95 @@ body {
     font-size: 1.15rem;
   }
 }
+
+/* SIDEBAR CSS */
+.sidebar-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.sidebar {
+  position: fixed;
+  top: 0; left: -320px;
+  width: 300px;
+  max-width: 80%;
+  height: 100vh;
+  background-color: var(--bg-color);
+  z-index: 1001;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  transition: left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar.active {
+  left: 0;
+}
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: var(--tools-gradient);
+  color: white;
+}
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.btn-close-sidebar {
+  background: none; border: none; color: white; font-size: 2rem; cursor: pointer;
+  line-height: 1;
+}
+.sidebar-content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+.sidebar-section {
+  margin-bottom: 20px;
+}
+.sidebar-label {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 8px;
+}
+.sidebar-plano {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+}
+.sidebar-no-info {
+  color: #888;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+.btn-editar-sidebar {
+  width: 100%;
+  padding: 12px;
+  background: var(--tools-gradient);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 20px;
+}
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+}
+
 </style>

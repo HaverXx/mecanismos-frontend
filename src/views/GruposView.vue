@@ -239,7 +239,7 @@ export default {
   methods: {
     cargarGrupos() {
       this.loadingGrupos = true;
-      fetch("http://localhost:3000/grupos/mis-grupos", {
+      fetch(`${window.API_URL}/grupos/mis-grupos`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }
@@ -268,7 +268,7 @@ export default {
       });
     },
     cargarInvitaciones() {
-      fetch("http://localhost:3000/invitaciones/recibidas", {
+      fetch(`${window.API_URL}/invitaciones/recibidas`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }
@@ -284,7 +284,7 @@ export default {
     },
     crearGrupo() {
       this.creandoGrupo = true;
-      fetch("http://localhost:3000/grupos", {
+      fetch(`${window.API_URL}/grupos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -323,7 +323,7 @@ export default {
     },
     cargarMiembros(idGrupo) {
       this.loadingMiembros = true;
-      fetch(`http://localhost:3000/grupos/${idGrupo}/miembros`, {
+      fetch(`${window.API_URL}/grupos/${idGrupo}/miembros`, {
         headers: {
           "Authorization": `Bearer ${this.token}`
         }
@@ -345,7 +345,7 @@ export default {
       this.invitando = true;
       this.invitadoExitoso = false;
       this.invitadoError = "";
-      fetch(`http://localhost:3000/grupos/${this.grupoSeleccionado.idGrupo}/invitar`, {
+      fetch(`${window.API_URL}/grupos/${this.grupoSeleccionado.idGrupo}/invitar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -374,7 +374,7 @@ export default {
       this.$emit("confirmar", {
         mensaje: `¿Estás seguro de que quieres expulsar a ${name} del grupo?`,
         callback: () => {
-          fetch(`http://localhost:3000/grupos/${idGrupo}/miembros/${idUsuario}`, {
+          fetch(`${window.API_URL}/grupos/${idGrupo}/miembros/${idUsuario}`, {
             method: "DELETE",
             headers: {
               "Authorization": `Bearer ${this.token}`
@@ -399,7 +399,7 @@ export default {
       this.$emit("confirmar", {
         mensaje: "¿Estás seguro de que deseas salir de este grupo? Ya no tendrás acceso a sus viviendas.",
         callback: () => {
-          fetch(`http://localhost:3000/grupos/${idGrupo}/miembros/${this.usuarioLogueado.idUsuario}`, {
+          fetch(`${window.API_URL}/grupos/${idGrupo}/miembros/${this.usuarioLogueado.idUsuario}`, {
             method: "DELETE",
             headers: {
               "Authorization": `Bearer ${this.token}`
@@ -425,7 +425,7 @@ export default {
       this.$emit("confirmar", {
         mensaje: "¿Estás seguro de que quieres eliminar este grupo permanentemente? Se eliminarán todas las invitaciones y asociaciones a viviendas.",
         callback: () => {
-          fetch(`http://localhost:3000/grupos/${idGrupo}`, {
+          fetch(`${window.API_URL}/grupos/${idGrupo}`, {
             method: "DELETE",
             headers: {
               "Authorization": `Bearer ${this.token}`
@@ -451,7 +451,7 @@ export default {
       this.$emit("confirmar", {
         mensaje: `¿Estás seguro de que quieres hacer propietario del grupo a ${name}? Perderás los permisos de administración.`,
         callback: () => {
-          fetch(`http://localhost:3000/grupos/${idGrupo}/owner`, {
+          fetch(`${window.API_URL}/grupos/${idGrupo}/owner`, {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
@@ -479,7 +479,7 @@ export default {
       });
     },
     responderInvitacion(idInvitacion, accion) {
-      fetch(`http://localhost:3000/invitaciones/${idInvitacion}/responder`, {
+      fetch(`${window.API_URL}/invitaciones/${idInvitacion}/responder`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

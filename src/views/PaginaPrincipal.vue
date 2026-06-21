@@ -3,17 +3,26 @@
         <span class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === null }" @click="habitacionSeleccionada = null">
             General
         </span>
-        <span v-for="habitacion in habitaciones" :key="habitacion" class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === habitacion }" @click="habitacionSeleccionada = habitacion">{{ habitacion }}</span>
+        <span v-for="hab in habitaciones" :key="hab.idHabitacion" class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === hab.nombre }" @click="habitacionSeleccionada = hab.nombre">
+            {{ hab.nombre }}
+            <span class="room-delete" @click.stop="eliminarHabitacion(hab.idHabitacion)">&times;</span>
+        </span>
+        <span v-if="!creandoHabitacion" class="roomOpt room-add" @click="creandoHabitacion = true">+</span>
+        <span v-else class="room-input-wrapper">
+            <input type="text" v-model="nuevaHabitacionNombre" placeholder="Nombre..." class="room-input" @keyup.enter="guardarHabitacion" ref="roomInput" />
+            <button class="room-input-btn" @click="guardarHabitacion">&#10003;</button>
+            <button class="room-input-btn room-input-cancel" @click="creandoHabitacion = false; nuevaHabitacionNombre = ''">&times;</button>
+        </span>
     </div>
 
     <div id="mecanismos">
         <div class="mecanismo" v-for="mecanismo in mecanismosFiltrados" :key="mecanismo.idMecanismo">
-            <img src="../assets/editarM.png" alt="Editar" width="10px" class="editar" @click="editarMecanismo(mecanismo), this.editando = true, mecanismoEditado = mecanismo.idMecanismo"/>
+            <img src="../assets/editarM.png" alt="Editar" width="18px" class="editar" @click="editarMecanismo(mecanismo), this.editando = true, mecanismoEditado = mecanismo.idMecanismo"/>
             <h3 class="titulo">{{ mecanismo.nombre }}</h3>
-            <img src="../assets/borrar.png" alt="Borrar" width="10px" class="borrar" @click="eliminarMecanismo(mecanismo.idMecanismo)" />
+            <img src="../assets/borrar.png" alt="Borrar" width="18px" class="borrar" @click="eliminarMecanismo(mecanismo.idMecanismo)" />
             <h3 class="desc">{{ mecanismo.descripcion }}</h3>
             <div class="mecanismo-img-container">
-                <img :src="mecanismo.foto || defaultImagen" alt="Imagen de mecanismo" class="mecanismo-img" />
+                <img :src="getMecanismoImagen(mecanismo)" alt="Imagen de mecanismo" class="mecanismo-img" />
             </div>
             <h3>Precio Unitario: {{ (parseFloat(mecanismo.precioUnitario) || 0).toFixed(2) }}€</h3>
             <h3>Total: {{ ((parseFloat(mecanismo.precioUnitario) || 0) * (mecanismo.cantidad || 0)).toFixed(2) }}€</h3>
@@ -36,13 +45,31 @@
              <div v-if="!editando" id="titulo">Añadir mecanismo</div>
              <div v-if="editando" id="titulo">Editar mecanismo</div>
              <div class="popup-body">
+                 <!-- Plantillas rápidas -->
+                 <div v-if="!editando" class="plantillas-seccion">
+                     <p class="plantilla-titulo">Plantillas rápidas</p>
+                     <div class="plantillas-grid">
+                         <button 
+                             type="button" 
+                             class="btn-plantilla" 
+                             v-for="t in plantillas" 
+                             :key="t.id" 
+                             @click="seleccionarPlantilla(t)"
+                             :class="{ active: plantillaSeleccionada === t.id }"
+                         >
+                             <span class="plantilla-icono">{{ t.icono }}</span>
+                             <span class="plantilla-label">{{ t.label }}</span>
+                         </button>
+                     </div>
+                 </div>
+
                  <p>Nombre</p>
-                 <input type="text" placeholder="Ej. Enchufe simple" v-model="nombreAnyadir"/>
+                 <input type="text" placeholder="Ej. Enchufe simple" v-model="nombreAnyadir" @input="comprobarPlantillaManual"/>
                  <p>Descripción</p>
-                 <input type="text" placeholder="Ej. Marca Legrand" v-model="descripcionAnyadir"/>
+                 <input type="text" placeholder="Ej. Marca Legrand" v-model="descripcionAnyadir" @input="comprobarPlantillaManual"/>
                  <p>Precio</p>
                  <div class="precio-container">
-                     <input type="text" placeholder="Ej. 4" v-model="precioAnyadir"/>
+                     <input type="text" placeholder="Ej. 4" v-model="precioAnyadir" @input="comprobarPlantillaManual"/>
                      <span class="currency">€</span>
                  </div>
                  <p>Cantidad</p>
@@ -75,6 +102,13 @@
 
 <script>
 import defaultImagen from "@/assets/enchufe.png";
+import svgEnchufe from "@/assets/enchufe.svg";
+import svgInterruptor from "@/assets/interruptor.svg";
+import svgConmutador from "@/assets/conmutador.svg";
+import svgCruzamiento from "@/assets/cruzamiento.svg";
+import svgPulsador from "@/assets/pulsador.svg";
+import svgRJ45 from "@/assets/rj45.svg";
+import svgTV from "@/assets/tv.svg";
 
 export default {
     data() {
@@ -90,8 +124,20 @@ export default {
             defaultImagen,
             editando: false,
             mecanismoEditado: null,
-            habitaciones: ["Salón", "Cocina", "Dormitorio", "Baño"],
+            habitaciones: [],
             habitacionSeleccionada: null,
+            creandoHabitacion: false,
+            nuevaHabitacionNombre: "",
+            plantillaSeleccionada: null,
+            plantillas: [
+                { id: "enchufe", label: "Enchufe", icono: "🔌", nombre: "Enchufe simple", descripcion: "Toma de corriente Schuko 16A", precio: 4.50, imagen: svgEnchufe },
+                { id: "interruptor", label: "Interruptor", icono: "💡", nombre: "Interruptor simple", descripcion: "Interruptor monopolar 10AX", precio: 3.80, imagen: svgInterruptor },
+                { id: "conmutador", label: "Conmutador", icono: "↕️", nombre: "Conmutador", descripcion: "Conmutador simple 10AX", precio: 4.20, imagen: svgConmutador },
+                { id: "cruzamiento", label: "Cruzamiento", icono: "🔄", nombre: "Cruzamiento", descripcion: "Cruzamiento 10AX", precio: 5.90, imagen: svgCruzamiento },
+                { id: "pulsador", label: "Pulsador", icono: "🛎️", nombre: "Pulsador", descripcion: "Pulsador campana/luz 10A", precio: 4.00, imagen: svgPulsador },
+                { id: "rj45", label: "Toma RJ45", icono: "🌐", nombre: "Toma RJ45", descripcion: "Toma de datos Cat6 UTP", precio: 7.50, imagen: svgRJ45 },
+                { id: "tv", label: "Toma TV", icono: "📺", nombre: "Toma TV", descripcion: "Toma de televisión intermedia", precio: 5.20, imagen: svgTV }
+            ]
         }
     },
     props: {
@@ -103,6 +149,7 @@ export default {
             immediate: true,
             handler() {
                 this.cargarMecanismos();
+                this.cargarHabitaciones();
             }
         }
     },
@@ -128,7 +175,7 @@ export default {
                 this.mecanismos = [];
                 return;
             }
-            fetch(`http://localhost:3000/mecanismos?idVivienda=${this.idViviendaSeleccionada}`, {
+            fetch(`${window.API_URL}/mecanismos?idVivienda=${this.idViviendaSeleccionada}`, {
                 headers: {
                     "Authorization": `Bearer ${this.token}`
                 }
@@ -170,9 +217,46 @@ export default {
             this.fotoAnyadir = "";
             this.fotoPreview = "";
             this.error = "";
+            this.plantillaSeleccionada = null;
             if (this.$refs.fileInput) {
                 this.$refs.fileInput.value = "";
             }
+        },
+        cargarHabitaciones() {
+            if (!this.idViviendaSeleccionada || !this.token) { this.habitaciones = []; return; }
+            fetch(`${window.API_URL}/habitaciones?idVivienda=${this.idViviendaSeleccionada}`, {
+                headers: { "Authorization": `Bearer ${this.token}` }
+            })
+            .then(r => r.json())
+            .then(data => { this.habitaciones = data; })
+            .catch(() => { this.habitaciones = []; });
+        },
+        guardarHabitacion() {
+            const nombre = this.nuevaHabitacionNombre.trim();
+            if (!nombre) return;
+            fetch(`${window.API_URL}/habitaciones`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${this.token}` },
+                body: JSON.stringify({ nombre, idVivienda: this.idViviendaSeleccionada })
+            })
+            .then(r => r.json())
+            .then(hab => {
+                this.habitaciones.push(hab);
+                this.nuevaHabitacionNombre = "";
+                this.creandoHabitacion = false;
+            })
+            .catch(() => {});
+        },
+        eliminarHabitacion(id) {
+            fetch(`${window.API_URL}/habitaciones/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${this.token}` }
+            })
+            .then(() => {
+                this.habitaciones = this.habitaciones.filter(h => h.idHabitacion !== id);
+                this.habitacionSeleccionada = null;
+            })
+            .catch(() => {});
         },
         guardarMecanismo() {
             if (!this.puedeGuardar) return;
@@ -185,7 +269,7 @@ export default {
                 idVivienda: this.idViviendaSeleccionada,
                 idHabitacion: this.habitacionSeleccionada
             };
-            fetch("http://localhost:3000/mecanismos", {
+            fetch(`${window.API_URL}/mecanismos`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -208,7 +292,7 @@ export default {
         actualizarCantidad(mecanismo, cambio) {
             const nuevaCantidad = mecanismo.cantidad + cambio;
             if (nuevaCantidad < 1) return;
-            fetch(`http://localhost:3000/mecanismos/${mecanismo.idMecanismo}`, {
+            fetch(`${window.API_URL}/mecanismos/${mecanismo.idMecanismo}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -228,7 +312,7 @@ export default {
             this.$emit("confirmar", {
                 mensaje: "¿Estás seguro de que deseas eliminar este mecanismo?",
                 callback: () => {
-                    fetch(`http://localhost:3000/mecanismos/${id}`, {
+                    fetch(`${window.API_URL}/mecanismos/${id}`, {
                         method: "DELETE",
                         headers: {
                             "Authorization": `Bearer ${this.token}`
@@ -252,10 +336,11 @@ export default {
             this.cantidadAnyadir = mecanismo.cantidad;
             this.fotoAnyadir = mecanismo.foto;
             this.fotoPreview = mecanismo.foto;
+            this.plantillaSeleccionada = null;
         },
         actualizarMecanismo(id) {
             if (!this.puedeGuardar) return;
-            fetch(`http://localhost:3000/mecanismos/${id}`, {
+            fetch(`${window.API_URL}/mecanismos/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -288,6 +373,70 @@ export default {
             .catch(err => {
                 this.$emit("alertar", "No se pudo guardar el mecanismo: " + err.message);
             });
+        },
+        seleccionarPlantilla(plantilla) {
+            if (this.plantillaSeleccionada === plantilla.id) {
+                this.plantillaSeleccionada = null;
+                this.nombreAnyadir = "";
+                this.descripcionAnyadir = "";
+                this.precioAnyadir = null;
+                this.cantidadAnyadir = null;
+            } else {
+                this.plantillaSeleccionada = plantilla.id;
+                this.nombreAnyadir = plantilla.nombre;
+                this.descripcionAnyadir = plantilla.descripcion;
+                this.precioAnyadir = plantilla.precio;
+                if (!this.cantidadAnyadir) {
+                    this.cantidadAnyadir = 1;
+                }
+            }
+        },
+        comprobarPlantillaManual() {
+            if (this.plantillaSeleccionada) {
+                const plantilla = this.plantillas.find(p => p.id === this.plantillaSeleccionada);
+                if (plantilla) {
+                    if (this.nombreAnyadir !== plantilla.nombre ||
+                        this.descripcionAnyadir !== plantilla.descripcion ||
+                        parseFloat(this.precioAnyadir) !== plantilla.precio) {
+                        this.plantillaSeleccionada = null;
+                    }
+                }
+            }
+        },
+        getMecanismoImagen(mecanismo) {
+            if (mecanismo.foto) {
+                return mecanismo.foto;
+            }
+            const nombre = (mecanismo.nombre || "").toLowerCase();
+            if (nombre.includes("enchufe") || nombre.includes("toma corriente")) {
+                const p = this.plantillas.find(pl => pl.id === "enchufe");
+                return p ? p.imagen : this.defaultImagen;
+            }
+            if (nombre.includes("conmutador")) {
+                const p = this.plantillas.find(pl => pl.id === "conmutador");
+                return p ? p.imagen : this.defaultImagen;
+            }
+            if (nombre.includes("cruzamiento")) {
+                const p = this.plantillas.find(pl => pl.id === "cruzamiento");
+                return p ? p.imagen : this.defaultImagen;
+            }
+            if (nombre.includes("pulsador")) {
+                const p = this.plantillas.find(pl => pl.id === "pulsador");
+                return p ? p.imagen : this.defaultImagen;
+            }
+            if (nombre.includes("rj45") || nombre.includes("datos") || nombre.includes("red") || nombre.includes("ethernet")) {
+                const p = this.plantillas.find(pl => pl.id === "rj45");
+                return p ? p.imagen : this.defaultImagen;
+            }
+            if (nombre.includes("tv") || nombre.includes("television") || nombre.includes("satelite") || nombre.includes("sat")) {
+                const p = this.plantillas.find(pl => pl.id === "tv");
+                return p ? p.imagen : this.defaultImagen;
+            }
+            if (nombre.includes("interruptor") || nombre.includes("llave")) {
+                const p = this.plantillas.find(pl => pl.id === "interruptor");
+                return p ? p.imagen : this.defaultImagen;
+            }
+            return this.defaultImagen;
         },
         anyadirMecanismo() {
             this.popupVisible = true;
@@ -475,11 +624,11 @@ footer {
 
 .editar {
     position: absolute;
-    top: -3px;
-    left: 10px;
+    top: 10px;
+    left: 12px;
     cursor: pointer;
     padding: 4px;
-    border-radius: 4px;
+    border-radius: 6px;
     opacity: 0;
     transition: background-color 0.2s ease, opacity 0.2s ease;
 }
@@ -490,11 +639,11 @@ footer {
 
 .borrar {
     position: absolute;
-    top: -3px;
-    right: 10px;
+    top: 10px;
+    right: 12px;
     cursor: pointer;
     padding: 4px;
-    border-radius: 4px;
+    border-radius: 6px;
     opacity: 0;
     transition: background-color 0.2s ease, opacity 0.2s ease;
 }
@@ -519,6 +668,7 @@ footer {
     border: 1px solid var(--card-border);
     width: 380px;
     overflow: hidden;
+    z-index: 100000;
 }
 
 #titulo {
@@ -654,11 +804,10 @@ footer {
 #anyadirMecanismo{
     border-radius: 50%;
     border: none;
-    width: 3%;
-    height: 6%;
+    width: 50px;
+    height: 50px;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.15s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -873,5 +1022,148 @@ footer {
         font-size: 0.8rem;
         padding: 4px 8px;
     }
+}
+
+/* ===== PLANTILLAS CSS ===== */
+.plantillas-seccion {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 4px;
+    background: rgba(247, 250, 252, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.plantilla-titulo {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #4a5568;
+    text-align: left;
+    margin: 0;
+}
+
+.plantillas-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.btn-plantilla {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.btn-plantilla:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.btn-plantilla:active {
+    transform: translateY(0);
+}
+
+.btn-plantilla.active {
+    background: linear-gradient(135deg, rgba(109, 180, 247, 0.15), rgba(74, 151, 237, 0.15));
+    border-color: rgb(109, 180, 247);
+    color: rgb(74, 151, 237);
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(109, 180, 247, 0.25);
+}
+
+.plantilla-icono {
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+}
+
+.plantilla-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.btn-plantilla.active .plantilla-label {
+    color: rgb(59, 130, 246);
+}
+
+/* Ajustes responsivos para rejilla */
+@media (max-width: 640px) {
+    .plantillas-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ===== ROOMS EDITING ===== */
+.roomOpt {
+    position: relative;
+}
+
+.room-delete {
+    display: none;
+    margin-left: 4px;
+    font-size: 0.85rem;
+    color: #e53e3e;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.roomOpt:hover .room-delete {
+    display: inline;
+}
+
+.room-add {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: rgb(74, 151, 237);
+    padding: 4px 12px;
+}
+
+.room-input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.room-input {
+    width: 100px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-color);
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.room-input:focus {
+    border-color: rgb(109, 180, 247);
+    box-shadow: 0 0 0 2px rgba(109, 180, 247, 0.25);
+}
+
+.room-input-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2d8a4e;
+    padding: 2px 6px;
+}
+
+.room-input-cancel {
+    color: #e53e3e;
 }
 </style>
