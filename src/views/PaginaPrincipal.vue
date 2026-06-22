@@ -248,13 +248,19 @@ export default {
             .catch(() => {});
         },
         eliminarHabitacion(id) {
-            fetch(`${window.API_URL}/habitaciones/${id}`, {
+            const idNum = Number(id);
+            const habitacionEliminada = this.habitaciones.find(h => Number(h.idHabitacion) === idNum);
+            const nombreEliminado = habitacionEliminada?.nombre;
+
+            fetch(`${window.API_URL}/habitaciones/${idNum}`, {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${this.token}` }
             })
             .then(() => {
-                this.habitaciones = this.habitaciones.filter(h => h.idHabitacion !== id);
-                this.habitacionSeleccionada = null;
+                this.habitaciones = this.habitaciones.filter(h => Number(h.idHabitacion) !== idNum);
+                if (nombreEliminado && this.habitacionSeleccionada === nombreEliminado) {
+                    this.habitacionSeleccionada = null;
+                }
             })
             .catch(() => {});
         },
