@@ -1,5 +1,6 @@
 <template>
-  <div v-if="usuarioLogueado">
+  <div>
+    <div v-if="usuarioLogueado">
     <!-- Sidebar / Menú Lateral -->
     <div class="sidebar-overlay" :class="{ active: sidebarAbierto }" @click="sidebarAbierto = false"></div>
     <div class="sidebar" :class="{ active: sidebarAbierto }">
@@ -31,10 +32,14 @@
       
       <template v-if="vistaActiva === 'mecanismos' || vistaActiva === 'presupuestos'">
         <select id="viviendas" name="viviendas" v-model="idViviendaSeleccionada" @change="CambiarViviendaSeleccionada()">
-          <option v-if="viviendas.length === 0" :value="null">No hay viviendas</option>
-          <option v-else v-for="vivienda in viviendas" :key="vivienda.idVivienda" :value="vivienda.idVivienda">
-            {{ vivienda.nombre }}
-          </option>
+          <template v-if="viviendas.length === 0">
+            <option :value="null">No hay viviendas</option>
+          </template>
+          <template v-else>
+            <option v-for="vivienda in viviendas" :key="vivienda.idVivienda" :value="vivienda.idVivienda">
+              {{ vivienda.nombre }}
+            </option>
+          </template>
         </select>
         <img src="./assets/editarC.png" alt="Add" width="20px" id="addRoom" @click="popupViviendas = true"/>
       </template>
@@ -204,9 +209,11 @@
       </div>
     </div>
   </div>
+  </div>
   <div v-else>
     <LoginView @login-success="onLoginSuccess" />
   </div>
+</div>
 </template>
 
 <script>
