@@ -1233,20 +1233,28 @@ body {
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 640px) {
   #tools {
-    flex-wrap: wrap;
-    padding: 10px 16px;
-    gap: 10px;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: auto minmax(120px, 1fr) auto auto;
+    grid-template-rows: auto auto;
+    gap: 10px 8px;
+    padding: 10px 14px;
     align-items: center;
   }
 
+  .hamburger-btn {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
   .nav-tabs {
-    margin-left: 0;
-    width: 100%;
-    order: 10;
-    justify-content: center;
+    grid-column: 2 / 4;
+    grid-row: 1;
+    justify-self: start;
+    display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+    width: 100%;
+    margin: 0;
   }
 
   .nav-tab {
@@ -1254,37 +1262,46 @@ body {
     font-size: 0.78rem;
   }
 
-  #tools > img:first-child {
-    width: 32px;
+  .theme-toggle-btn {
+    grid-column: 4;
+    grid-row: 1;
+    justify-self: end;
+    width: 36px;
+    height: 36px;
   }
 
-  .hamburger-btn {
-    order: 1;
+  .user-panel {
+    grid-column: 1 / span 4;
+    grid-row: 1;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  #tools > img:first-child {
+    grid-column: 1;
+    grid-row: 2;
+    width: 28px;
+    justify-self: start;
   }
 
   #viviendas {
-    width: min(100%, 200px);
+    grid-column: 2 / 4;
+    grid-row: 2;
+    width: 100%;
     min-width: 140px;
     font-size: 14px;
     padding: 6px 10px;
   }
 
   #addRoom {
-    width: 28px !important;
-    height: auto;
-  }
-
-  .theme-toggle-btn {
-    width: 36px;
-    height: 36px;
-  }
-
-  .user-panel {
-    order: 11;
-    margin-left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
+    grid-column: 4;
+    grid-row: 2;
+    width: 32px !important;
+    height: 32px;
+    justify-self: end;
   }
 
   #popup-viviendas,
@@ -1295,10 +1312,7 @@ body {
     max-width: 380px;
   }
 
-  .popup-body-viviendas {
-    padding: 16px;
-  }
-
+  .popup-body-viviendas,
   .popup-body-form-vivienda {
     padding: 16px;
   }
