@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <div v-if="usuarioLogueado">
+  <div v-if="usuarioLogueado">
     <!-- Sidebar / Menú Lateral -->
     <div class="sidebar-overlay" :class="{ active: sidebarAbierto }" @click="sidebarAbierto = false"></div>
     <div class="sidebar" :class="{ active: sidebarAbierto }">
@@ -28,7 +27,7 @@
       <button class="hamburger-btn" @click="sidebarAbierto = true" aria-label="Menú">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
-      <img src="./assets/logo.png" alt="Logo" width="50px" class="app-logo" />
+      <img src="./assets/logo.png" alt="Logo" width="50px"/>
       
       <template v-if="vistaActiva === 'mecanismos' || vistaActiva === 'presupuestos'">
         <select id="viviendas" name="viviendas" v-model="idViviendaSeleccionada" @change="CambiarViviendaSeleccionada()">
@@ -56,7 +55,6 @@
         </button>
       </div>
       
-      <div class="app-actions">
         <button class="theme-toggle-btn" @click="toggleTheme" aria-label="Cambiar tema">
           <svg v-if="temaOscuro" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon">
             <circle cx="12" cy="12" r="5"></circle>
@@ -74,7 +72,7 @@
           </svg>
         </button>
 
-        <div class="user-panel">
+      <div class="user-panel">
         <div class="user-dropdown-container" ref="userDropdown">
           <button class="user-avatar-btn" @click="toggleDropdown" aria-label="Usuario">
             <div class="avatar-circle">
@@ -209,11 +207,9 @@
       </div>
     </div>
   </div>
-  </div>
   <div v-else>
     <LoginView @login-success="onLoginSuccess" />
   </div>
-</div>
 </template>
 
 <script>
@@ -1241,85 +1237,58 @@ body {
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 640px) {
   #tools {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: auto auto;
-    gap: 10px 8px;
-    padding: 10px 14px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 10px;
+    justify-content: space-between;
     align-items: center;
   }
 
+  .nav-tabs {
+    margin-left: 0;
+    width: 100%;
+    order: 10;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 
   .nav-tab {
     padding: 6px 10px;
     font-size: 0.78rem;
   }
 
-  .theme-toggle-btn {
+  #tools > img:first-child {
     width: 36px;
-    height: 36px;
-    min-width: 36px;
-  }
-
-  .user-panel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-  }
-
-  .app-actions {
-    grid-column: 3;
-    grid-row: 1;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-self: end;
-  }
-
-  .app-logo {
-    width: 36px;
-    height: auto;
-    grid-column: 1;
-    grid-row: 1;
-    justify-self: start;
-  }
-
-  .nav-tabs {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: stretch;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    width: 100%;
-    margin: 0;
   }
 
   .hamburger-btn {
-    grid-column: 1;
-    grid-row: 2;
-    width: 32px;
-    height: 32px;
-    padding: 5px;
-    justify-self: start;
+    order: 1;
   }
 
   #viviendas {
-    grid-column: 2;
-    grid-row: 2;
-    width: 100%;
-    min-width: 0;
+    width: min(100%, 200px);
+    min-width: 140px;
     font-size: 14px;
     padding: 6px 10px;
   }
 
   #addRoom {
-    grid-column: 3;
-    grid-row: 2;
-    width: 32px !important;
-    height: 32px;
-    justify-self: end;
+    width: 28px !important;
+    height: auto;
+  }
+
+  .theme-toggle-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .user-panel {
+    order: 11;
+    margin-left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
   }
 
   #popup-viviendas,
@@ -1330,7 +1299,10 @@ body {
     max-width: 380px;
   }
 
-  .popup-body-viviendas,
+  .popup-body-viviendas {
+    padding: 16px;
+  }
+
   .popup-body-form-vivienda {
     padding: 16px;
   }
