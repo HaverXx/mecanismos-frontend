@@ -3,7 +3,7 @@
         <span class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === null }" @click="habitacionSeleccionada = null">
             General
         </span>
-        <span v-for="hab in habitaciones" :key="hab.idHabitacion" class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === hab.nombre }" @click="habitacionSeleccionada = hab.nombre">
+        <span v-for="hab in habitaciones" :key="hab.idHabitacion" class="roomOpt" :class="{ roomOptActive: habitacionSeleccionada === Number(hab.idHabitacion) }" @click="habitacionSeleccionada = Number(hab.idHabitacion)">
             {{ hab.nombre }}
             <span class="room-delete" @click.stop="eliminarHabitacion(hab.idHabitacion)">&times;</span>
         </span>
@@ -119,6 +119,7 @@ export default {
             precioAnyadir: null,
             cantidadAnyadir: null,
             fotoAnyadir: "",
+            fotoPreview: "",
             error: "",
             popupVisible: false,
             defaultImagen,
@@ -144,6 +145,7 @@ export default {
         idViviendaSeleccionada: Number,
         token: String,
     },
+    emits: ["confirmar", "alertar"],
     watch: {
         idViviendaSeleccionada: {
             immediate: true,
@@ -228,8 +230,19 @@ export default {
                 headers: { "Authorization": `Bearer ${this.token}` }
             })
             .then(r => r.json())
-            .then(data => { this.habitaciones = data; })
-            .catch(() => { this.habitaciones = []; });
+            .then(data => { 
+                console.log("=== HABITACIONES CARGADAS ===");
+                console.log("Data bruta:", data);
+                data.forEach((hab, idx) => {
+                    console.log(`Habitacion ${idx}: id=${hab.idHabitacion} (tipo: ${typeof hab.idHabitacion}), nombre=${hab.nombre}`);
+                });
+                this.habitaciones = Array.isArray(data) ? data : [];
+                this.habitacionSeleccionada = null;
+            })
+            .catch((err) => { 
+                console.error("Error al cargar habitaciones:", err);
+                this.habitaciones = []; 
+            });
         },
         guardarHabitacion() {
             const nombre = this.nuevaHabitacionNombre.trim();
@@ -249,20 +262,25 @@ export default {
         },
         eliminarHabitacion(id) {
             const idNum = Number(id);
-            const habitacionEliminada = this.habitaciones.find(h => Number(h.idHabitacion) === idNum);
-            const nombreEliminado = habitacionEliminada?.nombre;
 
             fetch(`${window.API_URL}/habitaciones/${idNum}`, {
                 method: "DELETE",
                 headers: { "Authorization": `Bearer ${this.token}` }
             })
+            .then(res => {
+                if (!res.ok) throw new Error("Error del servidor al eliminar habitación");
+                return res.json();
+            })
             .then(() => {
                 this.habitaciones = this.habitaciones.filter(h => Number(h.idHabitacion) !== idNum);
-                if (nombreEliminado && this.habitacionSeleccionada === nombreEliminado) {
+                if (this.habitacionSeleccionada === idNum) {
                     this.habitacionSeleccionada = null;
                 }
             })
-            .catch(() => {});
+            .catch((err) => {
+                console.error("Error al eliminar habitación:", err);
+                alert("No se pudo eliminar la habitación. Intenta nuevamente.");
+            });
         },
         guardarMecanismo() {
             if (!this.puedeGuardar) return;
