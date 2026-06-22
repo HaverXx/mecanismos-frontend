@@ -483,7 +483,7 @@ footer {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    z-index: 10;
+    z-index: 0;
     color: var(--text-color);
 }
 
@@ -770,6 +770,7 @@ footer {
     left: 0;
     cursor: default;
     display: none;
+    z-index: 9999;
 }
 
 #blur.active {

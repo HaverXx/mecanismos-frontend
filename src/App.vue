@@ -1234,8 +1234,10 @@ body {
 @media (max-width: 640px) {
   #tools {
     flex-wrap: wrap;
-    padding: 12px 16px;
+    padding: 10px 16px;
     gap: 10px;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .nav-tabs {
@@ -1243,29 +1245,46 @@ body {
     width: 100%;
     order: 10;
     justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .nav-tab {
-    padding: 4px 10px;
-    font-size: 0.8rem;
+    padding: 6px 10px;
+    font-size: 0.78rem;
   }
 
   #tools > img:first-child {
-    width: 36px;
+    width: 32px;
+  }
+
+  .hamburger-btn {
+    order: 1;
   }
 
   #viviendas {
-    width: 140px;
+    width: min(100%, 200px);
+    min-width: 140px;
     font-size: 14px;
-    padding: 4px 8px;
+    padding: 6px 10px;
   }
 
   #addRoom {
-    width: 18px !important;
+    width: 28px !important;
+    height: auto;
+  }
+
+  .theme-toggle-btn {
+    width: 36px;
+    height: 36px;
   }
 
   .user-panel {
-    margin-left: auto;
+    order: 11;
+    margin-left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
   }
 
   #popup-viviendas,
