@@ -504,8 +504,8 @@ p {
   --footer-bg: rgba(239, 240, 253, 0.8);
   --popup-bg: white;
   --text-secondary: #718096;
-  --dropdown-bg: rgba(255, 255, 255, 0.9);
-  --dropdown-border: rgba(255, 255, 255, 0.5);
+  --dropdown-bg: #ffffff;
+  --dropdown-border: rgba(0, 0, 0, 0.1);
   --dropdown-hover: rgba(0, 0, 0, 0.04);
   --tools-gradient: linear-gradient(158deg, rgba(171, 202, 255, 1) 0%, rgba(100, 98, 194, 1) 100%);
 }
@@ -521,7 +521,7 @@ body.dark-theme {
   --footer-bg: rgba(26, 32, 44, 0.85);
   --popup-bg: #2d3748;
   --text-secondary: #a0aec0;
-  --dropdown-bg: rgba(45, 55, 72, 0.95);
+  --dropdown-bg: #2d3748;
   --dropdown-border: rgba(255, 255, 255, 0.1);
   --dropdown-hover: rgba(255, 255, 255, 0.08);
   --tools-gradient: linear-gradient(158deg, rgba(48, 55, 99, 1) 0%, rgba(24, 25, 41, 1) 100%);
@@ -586,8 +586,15 @@ body {
   border-radius: 20px;
   font-size: 16px;
   width: 200px;
-  background: linear-gradient(158deg, rgba(240, 245, 255, 1) 0%, rgba(203, 202, 221, 1) 100%);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+  outline: none;
+}
+
+#viviendas option {
+  background: var(--input-bg);
+  color: var(--text-color);
 }
 
 .user-panel {
@@ -1238,57 +1245,70 @@ body {
 @media (max-width: 640px) {
   #tools {
     flex-wrap: wrap;
-    padding: 12px 16px;
-    gap: 10px;
-    justify-content: space-between;
+    padding: 12px;
+    gap: 12px 8px;
+    justify-content: flex-start;
     align-items: center;
-  }
-
-  .nav-tabs {
-    margin-left: 0;
-    width: 100%;
-    order: 10;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .nav-tab {
-    padding: 6px 10px;
-    font-size: 0.78rem;
-  }
-
-  #tools > img:first-child {
-    width: 36px;
   }
 
   .hamburger-btn {
     order: 1;
+    padding: 4px;
   }
 
-  #viviendas {
-    width: min(100%, 200px);
-    min-width: 140px;
-    font-size: 14px;
-    padding: 6px 10px;
-  }
-
-  #addRoom {
-    width: 28px !important;
-    height: auto;
+  #tools > img[alt="Logo"] {
+    order: 2;
+    width: 40px !important;
+    margin-right: auto;
   }
 
   .theme-toggle-btn {
+    order: 3;
     width: 36px;
     height: 36px;
   }
 
   .user-panel {
-    order: 11;
+    order: 4;
+    width: auto;
     margin-left: 0;
+  }
+
+  #viviendas {
+    order: 5;
+    flex: 1;
+    min-width: 0;
     width: 100%;
-    display: flex;
-    justify-content: flex-end;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  #addRoom {
+    order: 6;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 6px;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+  }
+
+  .nav-tabs {
+    order: 7;
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding-bottom: 2px;
+  }
+
+  .nav-tab {
+    flex: 1;
+    padding: 8px 4px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    text-align: center;
   }
 
   #popup-viviendas,

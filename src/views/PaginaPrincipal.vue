@@ -11,13 +11,13 @@
         <span v-else class="room-input-wrapper">
             <input type="text" v-model="nuevaHabitacionNombre" placeholder="Nombre..." class="room-input" @keyup.enter="guardarHabitacion" ref="roomInput" />
             <button class="room-input-btn" @click="guardarHabitacion">&#10003;</button>
-            <button class="room-input-btn room-input-cancel" @click="creandoHabitacion = false; nuevaHabitacionNombre = ''">&times;</button>
+            <button class="room-input-btn room-input-cancel" @click="cancelarHabitacion">&times;</button>
         </span>
     </div>
 
     <div id="mecanismos">
         <div class="mecanismo" v-for="mecanismo in mecanismosFiltrados" :key="mecanismo.idMecanismo">
-            <img src="../assets/editarM.png" alt="Editar" width="18px" class="editar" @click="editarMecanismo(mecanismo), this.editando = true, mecanismoEditado = mecanismo.idMecanismo"/>
+            <img src="../assets/editarM.png" alt="Editar" width="18px" class="editar" @click="prepararEdicion(mecanismo)"/>
             <h3 class="titulo">{{ mecanismo.nombre }}</h3>
             <img src="../assets/borrar.png" alt="Borrar" width="18px" class="borrar" @click="eliminarMecanismo(mecanismo.idMecanismo)" />
             <h3 class="desc">{{ mecanismo.descripcion }}</h3>
@@ -32,7 +32,7 @@
             </h3>
         </div>
     </div>
-    <img src="../assets/anyadirM.png" alt="Añadir" @click="popupVisible = true, editando = false" id="anyadirMecanismo"/>
+    <img src="../assets/anyadirM.png" alt="Añadir" @click="prepararAnyadir" id="anyadirMecanismo"/>
     <br />
     <br />
     <br />
@@ -57,7 +57,6 @@
                              @click="seleccionarPlantilla(t)"
                              :class="{ active: plantillaSeleccionada === t.id }"
                          >
-                             <span class="plantilla-icono">{{ t.icono }}</span>
                              <span class="plantilla-label">{{ t.label }}</span>
                          </button>
                      </div>
@@ -131,13 +130,19 @@ export default {
             nuevaHabitacionNombre: "",
             plantillaSeleccionada: null,
             plantillas: [
-                { id: "enchufe", label: "Enchufe", icono: "🔌", nombre: "Enchufe simple", descripcion: "Toma de corriente Schuko 16A", precio: 4.50, imagen: svgEnchufe },
-                { id: "interruptor", label: "Interruptor", icono: "💡", nombre: "Interruptor simple", descripcion: "Interruptor monopolar 10AX", precio: 3.80, imagen: svgInterruptor },
-                { id: "conmutador", label: "Conmutador", icono: "↕️", nombre: "Conmutador", descripcion: "Conmutador simple 10AX", precio: 4.20, imagen: svgConmutador },
-                { id: "cruzamiento", label: "Cruzamiento", icono: "🔄", nombre: "Cruzamiento", descripcion: "Cruzamiento 10AX", precio: 5.90, imagen: svgCruzamiento },
-                { id: "pulsador", label: "Pulsador", icono: "🛎️", nombre: "Pulsador", descripcion: "Pulsador campana/luz 10A", precio: 4.00, imagen: svgPulsador },
-                { id: "rj45", label: "Toma RJ45", icono: "🌐", nombre: "Toma RJ45", descripcion: "Toma de datos Cat6 UTP", precio: 7.50, imagen: svgRJ45 },
-                { id: "tv", label: "Toma TV", icono: "📺", nombre: "Toma TV", descripcion: "Toma de televisión intermedia", precio: 5.20, imagen: svgTV }
+                { id: "enchufe", label: "Enchufe", nombre: "Enchufe simple", descripcion: "Toma de corriente Schuko 16A", precio: 4.50, imagen: svgEnchufe },
+                { id: "interruptor", label: "Interruptor", nombre: "Interruptor simple", descripcion: "Interruptor monopolar 10AX", precio: 3.80, imagen: svgInterruptor },
+                { id: "conmutador", label: "Conmutador", nombre: "Conmutador", descripcion: "Conmutador simple 10AX", precio: 4.20, imagen: svgConmutador },
+                { id: "cruzamiento", label: "Cruzamiento", nombre: "Cruzamiento", descripcion: "Cruzamiento 10AX", precio: 5.90, imagen: svgCruzamiento },
+                { id: "pulsador", label: "Pulsador", nombre: "Pulsador", descripcion: "Pulsador campana/luz 10A", precio: 4.00, imagen: svgPulsador },
+                { id: "rj45", label: "Toma RJ45", nombre: "Toma RJ45", descripcion: "Toma de datos Cat6 UTP", precio: 7.50, imagen: svgRJ45 },
+                { id: "tv", label: "Toma TV", nombre: "Toma TV", descripcion: "Toma de televisión intermedia", precio: 5.20, imagen: svgTV },
+                { id: "marco_simple", label: "Marco 1", nombre: "Marco simple", descripcion: "Marco de 1 elemento", precio: 2.00, imagen: defaultImagen },
+                { id: "marco_doble", label: "Marco 2", nombre: "Marco doble", descripcion: "Marco de 2 elementos", precio: 3.00, imagen: defaultImagen },
+                { id: "marco_triple", label: "Marco 3", nombre: "Marco triple", descripcion: "Marco de 3 elementos", precio: 4.00, imagen: defaultImagen },
+                { id: "marco_cuadruple", label: "Marco 4", nombre: "Marco cuádruple", descripcion: "Marco de 4 elementos", precio: 5.00, imagen: defaultImagen },
+                { id: "interruptor_persiana", label: "Persiana", nombre: "Interruptor persiana", descripcion: "Mecanismo para persianas", precio: 8.50, imagen: svgInterruptor },
+                { id: "doble_conmutador", label: "Doble Conm.", nombre: "Doble conmutador", descripcion: "Doble conmutador 10AX", precio: 7.20, imagen: svgConmutador }
             ]
         }
     },
@@ -231,11 +236,6 @@ export default {
             })
             .then(r => r.json())
             .then(data => { 
-                console.log("=== HABITACIONES CARGADAS ===");
-                console.log("Data bruta:", data);
-                data.forEach((hab, idx) => {
-                    console.log(`Habitacion ${idx}: id=${hab.idHabitacion} (tipo: ${typeof hab.idHabitacion}), nombre=${hab.nombre}`);
-                });
                 this.habitaciones = Array.isArray(data) ? data : [];
                 this.habitacionSeleccionada = null;
             })
@@ -464,6 +464,19 @@ export default {
         },
         anyadirMecanismo() {
             this.popupVisible = true;
+        },
+        prepararEdicion(mecanismo) {
+            this.editando = true;
+            this.mecanismoEditado = mecanismo.idMecanismo;
+            this.editarMecanismo(mecanismo);
+        },
+        prepararAnyadir() {
+            this.popupVisible = true;
+            this.editando = false;
+        },
+        cancelarHabitacion() {
+            this.creandoHabitacion = false;
+            this.nuevaHabitacionNombre = "";
         }
     },
     mounted() {
