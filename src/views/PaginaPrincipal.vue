@@ -108,6 +108,14 @@ import svgCruzamiento from "@/assets/cruzamiento.svg";
 import svgPulsador from "@/assets/pulsador.svg";
 import svgRJ45 from "@/assets/rj45.svg";
 import svgTV from "@/assets/tv.svg";
+import svgTapaEnchufe from "@/assets/tapa_enchufe.svg";
+import svgTapaInterruptor from "@/assets/tapa_interruptor.svg";
+import svgTapaPulsador from "@/assets/tapa_pulsador.svg";
+import svgTapaPartida from "@/assets/tapa_partida.svg";
+import svgMarcoSimple from "@/assets/marco_simple.svg";
+import svgMarcoDoble from "@/assets/marco_doble.svg";
+import svgMarcoTriple from "@/assets/marco_triple.svg";
+import svgMarcoCuadruple from "@/assets/marco_cuadruple.svg";
 
 export default {
     data() {
@@ -137,12 +145,16 @@ export default {
                 { id: "pulsador", label: "Pulsador", nombre: "Pulsador", descripcion: "Pulsador campana/luz 10A", precio: 4.00, imagen: svgPulsador },
                 { id: "rj45", label: "Toma RJ45", nombre: "Toma RJ45", descripcion: "Toma de datos Cat6 UTP", precio: 7.50, imagen: svgRJ45 },
                 { id: "tv", label: "Toma TV", nombre: "Toma TV", descripcion: "Toma de televisión intermedia", precio: 5.20, imagen: svgTV },
-                { id: "marco_simple", label: "Marco 1", nombre: "Marco simple", descripcion: "Marco de 1 elemento", precio: 2.00, imagen: defaultImagen },
-                { id: "marco_doble", label: "Marco 2", nombre: "Marco doble", descripcion: "Marco de 2 elementos", precio: 3.00, imagen: defaultImagen },
-                { id: "marco_triple", label: "Marco 3", nombre: "Marco triple", descripcion: "Marco de 3 elementos", precio: 4.00, imagen: defaultImagen },
-                { id: "marco_cuadruple", label: "Marco 4", nombre: "Marco cuádruple", descripcion: "Marco de 4 elementos", precio: 5.00, imagen: defaultImagen },
+                { id: "marco_simple", label: "Marco 1", nombre: "Marco simple", descripcion: "Marco de 1 elemento", precio: 2.00, imagen: svgMarcoSimple },
+                { id: "marco_doble", label: "Marco 2", nombre: "Marco doble", descripcion: "Marco de 2 elementos", precio: 3.00, imagen: svgMarcoDoble },
+                { id: "marco_triple", label: "Marco 3", nombre: "Marco triple", descripcion: "Marco de 3 elementos", precio: 4.00, imagen: svgMarcoTriple },
+                { id: "marco_cuadruple", label: "Marco 4", nombre: "Marco cuádruple", descripcion: "Marco de 4 elementos", precio: 5.00, imagen: svgMarcoCuadruple },
                 { id: "interruptor_persiana", label: "Persiana", nombre: "Interruptor persiana", descripcion: "Mecanismo para persianas", precio: 8.50, imagen: svgInterruptor },
-                { id: "doble_conmutador", label: "Doble Conm.", nombre: "Doble conmutador", descripcion: "Doble conmutador 10AX", precio: 7.20, imagen: svgConmutador }
+                { id: "doble_conmutador", label: "Doble Conm.", nombre: "Doble conmutador", descripcion: "Doble conmutador 10AX", precio: 7.20, imagen: svgConmutador },
+                { id: "tapa_enchufe", label: "Tapa Ench.", nombre: "Tapa de enchufe", descripcion: "Tapa para enchufe", precio: 1.50, imagen: svgTapaEnchufe },
+                { id: "tapa_interruptor", label: "Tapa Int.", nombre: "Tapa de interruptor", descripcion: "Tapa para interruptor/conmutador", precio: 1.20, imagen: svgTapaInterruptor },
+                { id: "tapa_pulsador", label: "Tapa Puls.", nombre: "Tapa de pulsador", descripcion: "Tapa para pulsador", precio: 1.20, imagen: svgTapaPulsador },
+                { id: "tapa_partida", label: "Tapa Partida", nombre: "Tapa partida", descripcion: "Tapa partida para doble mecanismo", precio: 1.80, imagen: svgTapaPartida }
             ]
         }
     },
@@ -432,6 +444,41 @@ export default {
                 return mecanismo.foto;
             }
             const nombre = (mecanismo.nombre || "").toLowerCase();
+            if (nombre.includes("tapa")) {
+                if (nombre.includes("enchufe") || nombre.includes("corriente")) {
+                    const p = this.plantillas.find(pl => pl.id === "tapa_enchufe");
+                    return p ? p.imagen : this.defaultImagen;
+                }
+                if (nombre.includes("interruptor") || nombre.includes("conmutador") || nombre.includes("cruzamiento")) {
+                    const p = this.plantillas.find(pl => pl.id === "tapa_interruptor");
+                    return p ? p.imagen : this.defaultImagen;
+                }
+                if (nombre.includes("pulsador")) {
+                    const p = this.plantillas.find(pl => pl.id === "tapa_pulsador");
+                    return p ? p.imagen : this.defaultImagen;
+                }
+                if (nombre.includes("partida") || nombre.includes("doble")) {
+                    const p = this.plantillas.find(pl => pl.id === "tapa_partida");
+                    return p ? p.imagen : this.defaultImagen;
+                }
+                return this.defaultImagen;
+            }
+            if (nombre.includes("marco")) {
+                if (nombre.includes("4") || nombre.includes("cuadruple") || nombre.includes("cuádruple")) {
+                    const p = this.plantillas.find(pl => pl.id === "marco_cuadruple");
+                    return p ? p.imagen : this.defaultImagen;
+                }
+                if (nombre.includes("3") || nombre.includes("triple")) {
+                    const p = this.plantillas.find(pl => pl.id === "marco_triple");
+                    return p ? p.imagen : this.defaultImagen;
+                }
+                if (nombre.includes("2") || nombre.includes("doble")) {
+                    const p = this.plantillas.find(pl => pl.id === "marco_doble");
+                    return p ? p.imagen : this.defaultImagen;
+                }
+                const p = this.plantillas.find(pl => pl.id === "marco_simple");
+                return p ? p.imagen : this.defaultImagen;
+            }
             if (nombre.includes("enchufe") || nombre.includes("toma corriente")) {
                 const p = this.plantillas.find(pl => pl.id === "enchufe");
                 return p ? p.imagen : this.defaultImagen;

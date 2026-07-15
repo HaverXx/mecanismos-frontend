@@ -12,7 +12,8 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "vue": "^3.2.13",
-    "vue-router": "^5.1.0"
+    "vue-router": "^5.1.0",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

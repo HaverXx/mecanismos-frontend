@@ -53,6 +53,9 @@
         <button class="nav-tab" :class="{ active: vistaActiva === 'grupos' }" @click="vistaActiva = 'grupos'">
           Grupos
         </button>
+        <button class="nav-tab" :class="{ active: vistaActiva === 'planificador' }" @click="vistaActiva = 'planificador'">
+          Planificador
+        </button>
       </div>
       
         <button class="theme-toggle-btn" @click="toggleTheme" aria-label="Cambiar tema">
@@ -105,6 +108,7 @@
       <PaginaPrincipal v-if="vistaActiva === 'mecanismos'" :idViviendaSeleccionada="idViviendaSeleccionada" :token="token" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
       <PresupuestosView v-else-if="vistaActiva === 'presupuestos'" :idViviendaSeleccionada="idViviendaSeleccionada" :token="token" :viviendas="viviendas" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
       <GruposView v-else-if="vistaActiva === 'grupos'" :token="token" :usuarioLogueado="usuarioLogueado" :viviendas="viviendas" @cargar-viviendas="cargarViviendas" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
+      <PlanificadorView v-else-if="vistaActiva === 'planificador'" :token="token" @confirmar="pedirConfirmacionEvent" @alertar="mostrarAlerta" />
     </main>
 
     <!-- Popup 1: Administrar Viviendas -->
@@ -217,13 +221,15 @@ import PaginaPrincipal from './views/PaginaPrincipal.vue'
 import LoginView from './views/LoginView.vue'
 import GruposView from './views/GruposView.vue'
 import PresupuestosView from './views/PresupuestosView.vue'
+import PlanificadorView from './views/PlanificadorView.vue'
 
 export default {
   components: {
     PaginaPrincipal,
     LoginView,
     GruposView,
-    PresupuestosView
+    PresupuestosView,
+    PlanificadorView
   },
   data() {
     const savedUser = localStorage.getItem("user");
